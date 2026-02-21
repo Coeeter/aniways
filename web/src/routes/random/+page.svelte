@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { LoaderCircle } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
+	import { captureRandomAnimeUsed } from '$lib/analytics';
 	import type { PageProps } from './$types';
 
 	let props: PageProps = $props();
@@ -12,6 +13,7 @@
 				return;
 			}
 
+			captureRandomAnimeUsed({ anime_id: data.id });
 			goto(`/anime/${data?.id}`, { replaceState: true });
 		});
 	});

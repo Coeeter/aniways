@@ -1,10 +1,16 @@
 <script lang="ts">
+	import { captureSettingToggled } from '$lib/analytics';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { getAppStateContext } from '$lib/context/state.svelte';
 
 	const appState = getAppStateContext();
+
+	function toggleSetting(key: 'autoPlayEpisode' | 'autoNextEpisode' | 'autoResumeEpisode' | 'incognitoMode') {
+		const newValue = appState.toggleSetting(key);
+		captureSettingToggled({ setting: key, new_value: newValue ?? false });
+	}
 </script>
 
 <Card.Root>
@@ -26,7 +32,7 @@
 					<Button
 						variant={appState.settings?.autoPlayEpisode ? 'default' : 'outline'}
 						size="sm"
-						onclick={() => appState.toggleSetting('autoPlayEpisode')}
+						onclick={() => toggleSetting('autoPlayEpisode')}
 					>
 						{appState.settings?.autoPlayEpisode ? 'Enabled' : 'Disabled'}
 					</Button>
@@ -42,7 +48,7 @@
 					<Button
 						variant={appState.settings?.autoNextEpisode ? 'default' : 'outline'}
 						size="sm"
-						onclick={() => appState.toggleSetting('autoNextEpisode')}
+						onclick={() => toggleSetting('autoNextEpisode')}
 					>
 						{appState.settings?.autoNextEpisode ? 'Enabled' : 'Disabled'}
 					</Button>
@@ -58,7 +64,7 @@
 					<Button
 						variant={appState.settings?.autoResumeEpisode ? 'default' : 'outline'}
 						size="sm"
-						onclick={() => appState.toggleSetting('autoResumeEpisode')}
+						onclick={() => toggleSetting('autoResumeEpisode')}
 					>
 						{appState.settings?.autoResumeEpisode ? 'Enabled' : 'Disabled'}
 					</Button>
@@ -74,7 +80,7 @@
 					<Button
 						variant={appState.settings?.incognitoMode ? 'default' : 'outline'}
 						size="sm"
-						onclick={() => appState.toggleSetting('incognitoMode')}
+						onclick={() => toggleSetting('incognitoMode')}
 					>
 						{appState.settings?.incognitoMode ? 'Enabled' : 'Disabled'}
 					</Button>

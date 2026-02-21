@@ -2,6 +2,7 @@
 	import { Check, Palette } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import type { components } from '$lib/api/openapi';
+	import { captureThemeChanged } from '$lib/analytics';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
@@ -18,6 +19,7 @@
 
 	function updateTheme(theme: Theme) {
 		appState.updateTheme(theme);
+		captureThemeChanged({ theme_id: theme.id, theme_name: theme.name });
 		toast.success(`Theme changed to ${theme.name}`);
 	}
 </script>

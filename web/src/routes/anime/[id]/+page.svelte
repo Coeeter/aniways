@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/state';
+	import { captureAnimeViewed } from '$lib/analytics';
 	import HeroSection from '$lib/components/anime/layout/hero-section.svelte';
 	import InfoSidebar from '$lib/components/anime/layout/info-sidebar.svelte';
 	import TabContent from '$lib/components/anime/layout/tab-content.svelte';
@@ -12,6 +14,17 @@
 	let selectedTab = $derived.by(() => {
 		const urlTab = page.url.searchParams.get('tab') || 'overview';
 		return urlTab as (typeof tabs)[number];
+	});
+
+	onMount(() => {
+		captureAnimeViewed({
+			anime_id: data.anime.id,
+			anime_title: data.anime.jname || data.anime.ename || '',
+			genres: data.anime.genre ? data.anime.genre.split(', ') : [],
+			season: data.anime.season || '',
+			season_year: data.anime.seasonYear ?? null,
+			rating: data.ratingLabel,
+		});
 	});
 </script>
 

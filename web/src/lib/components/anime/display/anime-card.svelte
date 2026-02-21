@@ -14,9 +14,10 @@
 		libraryEntry?: LibraryResponse | null;
 		episodeLink?: number | null;
 		class?: string;
+		onclick?: () => void;
 	}
 
-	let { anime, topLeftBadge, libraryEntry, episodeLink = null, class: className }: Props = $props();
+	let { anime, topLeftBadge, libraryEntry, episodeLink = null, class: className, onclick: onCardClick }: Props = $props();
 
 	let linkUrl = $derived(
 		episodeLink ? `/anime/${anime.id}/watch?ep=${episodeLink}` : `/anime/${anime.id}`,
@@ -32,7 +33,9 @@
 	onclick={(e) => {
 		if ((e.target as HTMLElement).closest('button')) {
 			e.preventDefault();
+			return;
 		}
+		onCardClick?.();
 	}}
 >
 	<div

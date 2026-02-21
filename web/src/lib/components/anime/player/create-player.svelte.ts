@@ -6,6 +6,7 @@ import { Captions, LoaderCircle, Pause, SkipForward } from 'lucide-svelte';
 import { goto } from '$app/navigation';
 import { PUBLIC_STREAMING_URL } from '$env/static/public';
 import type { components } from '$lib/api/openapi';
+import { captureEpisodeCompleted, captureEpisodePlayed } from '$lib/analytics';
 import type { AppState } from '$lib/context/state.svelte';
 import { convertComponentToHTML } from '$lib/utils';
 import { amplifyVolumePlugin, skipPlugin, thumbnailPlugin, windowKeyBindPlugin } from './plugins';
@@ -19,6 +20,11 @@ type Props = {
 	source: StreamInfo;
 	nextEpisodeUrl: string | null;
 	updateLibrary: () => Promise<void>;
+	animeId: string;
+	animeTitle: string;
+	episodeNumber: number;
+	serverName: string;
+	streamType: string;
 };
 
 const artplayerSettingsSchema = type({
@@ -32,6 +38,11 @@ export const createArtPlayer = ({
 	source,
 	nextEpisodeUrl,
 	updateLibrary,
+	animeId,
+	animeTitle,
+	episodeNumber,
+	serverName,
+	streamType,
 }: Props) => {
 	const abortController = new AbortController();
 	const thumbnails = source.tracks.find((track) => track.kind === 'thumbnails');
@@ -232,6 +243,19 @@ export const createArtPlayer = ({
 		},
 	});
 
+	let hasTrackedPlay = false;
+	art.on('play', () => {
+		if (hasTrackedPlay) return;
+		hasTrackedPlay = true;
+		captureEpisodePlayed({
+			anime_id: animeId,
+			anime_title: animeTitle,
+			episode_number: episodeNumber,
+			server_name: serverName,
+			stream_type: streamType,
+		});
+	});
+
 	art.on('ready', () => {
 		if (appState.settings?.autoResumeEpisode) {
 			const time = artplayerSettingsSchema(
@@ -259,6 +283,12 @@ export const createArtPlayer = ({
 	});
 
 	art.on('video:ended', async () => {
+		captureEpisodeCompleted({
+			anime_id: animeId,
+			anime_title: animeTitle,
+			episode_number: episodeNumber,
+		});
+
 		await updateLibrary();
 
 		if (nextEpisodeUrl && appState.settings?.autoNextEpisode) {

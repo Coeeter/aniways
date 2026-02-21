@@ -17,6 +17,7 @@
 	import { goto } from '$app/navigation';
 	import { apiClient } from '$lib/api/client';
 	import type { components } from '$lib/api/openapi';
+	import { captureUserRegistered } from '$lib/analytics';
 	import * as Form from '$lib/components/ui/form';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { cn } from '$lib/utils';
@@ -50,6 +51,7 @@
 				});
 
 				if (res.response.status === 200 && res.data) {
+					captureUserRegistered();
 					toast.success('Account created successfully!');
 					await goto('/login');
 					return;

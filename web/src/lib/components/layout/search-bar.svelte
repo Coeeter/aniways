@@ -3,6 +3,7 @@
 	import { Debounced, resource, watch } from 'runed';
 	import { onNavigate } from '$app/navigation';
 	import { apiClient } from '$lib/api/client';
+	import { captureSearch } from '$lib/analytics';
 	import { Button } from '../ui/button';
 	import * as Command from '../ui/command';
 
@@ -32,7 +33,9 @@
 				},
 				signal,
 			});
-			return response.data?.items || [];
+			const items = response.data?.items || [];
+			captureSearch({ query, result_count: items.length, navigated_to_catalog: false });
+			return items;
 		},
 		{
 			debounce: 0,
@@ -162,6 +165,12 @@
 						value="view-all-{rawQuery}"
 						class="flex cursor-pointer items-center justify-center gap-2 p-3 font-medium text-primary hover:bg-accent"
 						href="/catalog?search={rawQuery}"
+						onclick={() =>
+							captureSearch({
+								query: rawQuery,
+								result_count: searchResource.current.length,
+								navigated_to_catalog: true,
+							})}
 					>
 						<Search class="h-4 w-4" />
 						{searchResource.current.length > 0

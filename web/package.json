@@ -63,6 +63,8 @@
 		"lucide-svelte": "^0.539.0",
 		"nprogress": "^0.2.0",
 		"openapi-fetch": "^0.14.0",
+		"posthog-js": "^1.352.0",
+		"posthog-node": "^5.24.17",
 		"runed": "^0.35.1"
 	}
 }

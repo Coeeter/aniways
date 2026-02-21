@@ -16,6 +16,7 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { apiClient } from '$lib/api/client';
 	import type { components } from '$lib/api/openapi';
+	import { captureListItemAdded, captureListItemRemoved, captureListItemUpdated } from '$lib/analytics';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -71,15 +72,16 @@
 				return;
 			}
 
-			await invalidate('app:library');
-			toast.success('Added to library');
-			isOpen = false;
-		} catch {
-			toast.error('Failed to add to library');
-		} finally {
-			isAdding = false;
-		}
-	};
+		captureListItemAdded({ anime_id: animeId, list_type: 'watching' });
+		await invalidate('app:library');
+		toast.success('Added to library');
+		isOpen = false;
+	} catch {
+		toast.error('Failed to add to library');
+	} finally {
+		isAdding = false;
+	}
+};
 
 	const removeFromLibrary = async () => {
 		if (isDeleting) return;
@@ -95,15 +97,16 @@
 				return;
 			}
 
-			await invalidate('app:library');
-			toast.success('Removed from library');
-			isOpen = false;
-		} catch {
-			toast.error('Failed to remove from library');
-		} finally {
-			isDeleting = false;
-		}
-	};
+		captureListItemRemoved({ anime_id: animeId, list_type: libraryEntry?.status ?? 'unknown' });
+		await invalidate('app:library');
+		toast.success('Removed from library');
+		isOpen = false;
+	} catch {
+		toast.error('Failed to remove from library');
+	} finally {
+		isDeleting = false;
+	}
+};
 	const checkIfLoggedIn = (fn: () => void) => {
 		if (!appState.isLoggedIn) {
 			toast.error('You must be logged in to use the library', {
@@ -141,13 +144,18 @@
 					return;
 				}
 
-				await invalidate('app:library');
-				toast.success('Library updated');
-				isOpen = false;
-			} catch {
-				toast.error('Failed to update library');
-				cancel();
-			}
+			captureListItemUpdated({
+				anime_id: animeId,
+				status: form.data.status,
+				watched_episodes: form.data.watchedEpisodes,
+			});
+			await invalidate('app:library');
+			toast.success('Library updated');
+			isOpen = false;
+		} catch {
+			toast.error('Failed to update library');
+			cancel();
+		}
 		},
 	});
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Play } from 'lucide-svelte';
+	import { captureResumeClicked } from '$lib/analytics';
 	import AnimeCard from '$lib/components/anime/display/anime-card.svelte';
 	import EmptyState from '$lib/components/anime/display/empty-state.svelte';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
@@ -37,7 +38,16 @@
 				class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
 			>
 				{#each data.listings.items as item (item.id)}
-					<AnimeCard anime={item.anime} episodeLink={item.watchedEpisodes + 1} />
+					<AnimeCard
+						anime={item.anime}
+						episodeLink={item.watchedEpisodes + 1}
+						onclick={() =>
+							captureResumeClicked({
+								anime_id: item.anime.id,
+								anime_title: item.anime.jname || item.anime.ename || '',
+								resume_episode: item.watchedEpisodes + 1,
+							})}
+					/>
 				{/each}
 			</div>
 

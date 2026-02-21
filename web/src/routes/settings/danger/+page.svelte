@@ -5,6 +5,7 @@
 	import { defaults, setError, superForm } from 'sveltekit-superforms';
 	import { arktype, arktypeClient } from 'sveltekit-superforms/adapters';
 	import { goto, invalidate } from '$app/navigation';
+	import { captureAccountDeleted, captureLibraryCleared } from '$lib/analytics';
 	import { apiClient } from '$lib/api/client';
 	import type { components } from '$lib/api/openapi';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -41,6 +42,7 @@
 				});
 
 				if (res.response.status === 204) {
+					captureAccountDeleted();
 					await invalidate('app:user');
 					await goto('/');
 					toast.success('Account deleted successfully');
@@ -80,6 +82,7 @@
 		try {
 			const response = await apiClient.DELETE('/library');
 			if (response.response.status === 200) {
+				captureLibraryCleared();
 				toast.success('Library cleared successfully');
 				showClearDialog = false;
 			} else {

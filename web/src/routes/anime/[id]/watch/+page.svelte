@@ -16,6 +16,7 @@
 	import { toast } from 'svelte-sonner';
 	import { flip } from 'svelte/animate';
 	import { invalidate } from '$app/navigation';
+	import { captureServerSwitch, captureStreamError } from '$lib/analytics';
 	import { apiClient } from '$lib/api/client';
 	import LibraryBtn from '$lib/components/anime/controls/library-btn.svelte';
 	import Player from '$lib/components/anime/player/index.svelte';
@@ -30,6 +31,26 @@
 	const appState = getAppStateContext();
 
 	let selectedServer = $derived(data.servers[0] || null);
+
+	// Track stream errors once per error instance
+	let lastTrackedError = $state<string | null>(null);
+	$effect(() => {
+		const err = streamResource.error;
+		if (!err) {
+			lastTrackedError = null;
+			return;
+		}
+		const key = `${selectedServer?.serverId}:${err.message}`;
+		if (key === lastTrackedError) return;
+		lastTrackedError = key;
+		captureStreamError({
+			anime_id: data.anime.id,
+			episode_number: data.episodeNumber,
+			server_name: selectedServer?.serverName ?? 'unknown',
+			stream_type: selectedServer?.type?.toLowerCase() ?? 'unknown',
+			error_message: err.message,
+		});
+	});
 
 	const streamResource = resource(
 		[() => data.anime.id, () => selectedServer?.serverId, () => selectedServer?.type],
@@ -168,7 +189,19 @@
 							onclick={() => {
 								const servers = groupedServers[selectedServer?.type.toLowerCase() ?? ''] || [];
 								const index = servers.findIndex((s) => s.serverId === selectedServer?.serverId);
-								selectedServer = servers[(index + 1) % servers.length] || null;
+								const next = servers[(index + 1) % servers.length] || null;
+								if (next && next.serverId !== selectedServer?.serverId) {
+									captureServerSwitch({
+										anime_id: data.anime.id,
+										anime_title: data.anime.jname || data.anime.ename || '',
+										episode_number: data.episodeNumber,
+										from_server: selectedServer?.serverName ?? 'unknown',
+										to_server: next.serverName,
+										stream_type: next.type.toLowerCase(),
+										reason: 'error_fallback',
+									});
+								}
+								selectedServer = next;
 							}}
 							variant="secondary"
 							size="sm"
@@ -189,6 +222,11 @@
 						info={streamResource.current}
 						{nextEpisodeUrl}
 						{updateLibrary}
+						animeId={data.anime.id}
+						animeTitle={data.anime.jname || data.anime.ename || ''}
+						episodeNumber={data.episodeNumber}
+						serverName={selectedServer?.serverName ?? 'unknown'}
+						streamType={selectedServer?.type?.toLowerCase() ?? 'unknown'}
 					/>
 				{/key}
 			{/if}
@@ -222,7 +260,23 @@
 										? 'default'
 										: 'outline'}
 									size="sm"
-									onclick={() => (selectedServer = server)}
+									onclick={() => {
+										if (
+											server.serverId === selectedServer?.serverId &&
+											server.type === selectedServer?.type
+										)
+											return;
+										captureServerSwitch({
+											anime_id: data.anime.id,
+											anime_title: data.anime.jname || data.anime.ename || '',
+											episode_number: data.episodeNumber,
+											from_server: selectedServer?.serverName ?? 'unknown',
+											to_server: server.serverName,
+											stream_type: server.type.toLowerCase(),
+											reason: 'manual',
+										});
+										selectedServer = server;
+									}}
 									class="justify-start"
 								>
 									<Server class="mr-2 h-3 w-3" />

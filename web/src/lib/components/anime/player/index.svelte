@@ -10,9 +10,24 @@
 		info: StreamInfo;
 		nextEpisodeUrl: string | null;
 		updateLibrary: () => Promise<void>;
+		animeId: string;
+		animeTitle: string;
+		episodeNumber: number;
+		serverName: string;
+		streamType: string;
 	};
 
-	let { info, playerId, nextEpisodeUrl, updateLibrary }: Props = $props();
+	let {
+		info,
+		playerId,
+		nextEpisodeUrl,
+		updateLibrary,
+		animeId,
+		animeTitle,
+		episodeNumber,
+		serverName,
+		streamType,
+	}: Props = $props();
 	const appState = getAppStateContext();
 
 	let element: HTMLDivElement | null = $state(null);
@@ -27,6 +42,11 @@
 			source: info,
 			nextEpisodeUrl,
 			updateLibrary,
+			animeId,
+			animeTitle,
+			episodeNumber,
+			serverName,
+			streamType,
 		});
 
 		return () => {
