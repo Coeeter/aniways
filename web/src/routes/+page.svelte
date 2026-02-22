@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { Calendar, ChevronRight, Clock, Play, RefreshCcw, Star, TrendingUp } from 'lucide-svelte';
 	import { resource } from 'runed';
+	import { refreshAll } from '$app/navigation';
 	import { apiClient } from '$lib/api/client';
 	import AnimeCard from '$lib/components/anime/display/anime-card.svelte';
 	import AnimeSection from '$lib/components/anime/layout/anime-section.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
@@ -14,30 +14,36 @@
 	const isLoggedIn = $derived(data.isLoggedIn);
 
 	// Fetch homepage data client-side using runed resource
-	const homeResource = resource(
-		() => null,
-		async (_, __, { signal }) => {
-			const response = await apiClient.GET('/home', { signal });
-			if (response.error || !response.data) {
-				throw response.error || new Error('Failed to fetch homepage data');
-			}
-			return response.data;
+	const library = resource(
+		() => isLoggedIn,
+		async (loggedIn, _, { signal }) => {
+			if (!loggedIn) return { continueWatching: [], planning: [] };
+
+			const [continueWatching, planning] = await Promise.all([
+				apiClient.GET('/library/continue-watching', { signal }),
+				apiClient.GET('/library/planning', { signal }),
+			]);
+
+			return {
+				continueWatching: continueWatching.data?.items?.slice(0, 6) || [],
+				planning: planning.data?.items?.slice(0, 6) || [],
+			};
 		},
-		{ once: true },
+		{
+			initialValue: {
+				continueWatching: data.continueWatching ?? [],
+				planning: data.planning ?? [],
+			},
+		},
 	);
 
-	// Derived data from resource
-	const homeData = $derived(homeResource.current);
-	const hasError = $derived(!!homeResource.error);
-
-	// Extract data with fallbacks
-	const trending = $derived(homeData?.trending || []);
-	const popular = $derived(homeData?.popular || []);
-	const recentlyUpdated = $derived(homeData?.recentlyUpdated || []);
-	const seasonal = $derived(homeData?.seasonal || []);
-	const featuredAnime = $derived(homeData?.featuredAnime || null);
-	const continueWatching = $derived(homeData?.continueWatching || []);
-	const planning = $derived(homeData?.planning || []);
+	const trending = $derived(data?.trending || []);
+	const popular = $derived(data?.popular || []);
+	const recentlyUpdated = $derived(data?.recentlyUpdated || []);
+	const seasonal = $derived(data?.seasonal || []);
+	const featuredAnime = $derived(data?.featuredAnime || null);
+	const continueWatching = $derived(library.current?.continueWatching || []);
+	const planning = $derived(library.current?.planning || []);
 
 	const popularAnime = $derived(popular.slice(0, 8));
 </script>
@@ -51,7 +57,7 @@
 </svelte:head>
 
 <!-- Error State -->
-{#if hasError}
+{#if data?.error}
 	<div class="flex min-h-screen items-center justify-center p-4">
 		<div class="flex w-full flex-col items-center gap-4">
 			<h1 class="text-3xl font-bold">Failed to Load Homepage</h1>
@@ -60,222 +66,19 @@
 				Unable to load anime data. Please try again.
 			</p>
 			<div class="flex gap-4">
-				<Button onclick={() => homeResource.refetch()} variant="default">
+				<Button onclick={() => refreshAll()} variant="default">
 					<RefreshCcw class="mr-2 h-4 w-4" />
 					Try Again
 				</Button>
 			</div>
 		</div>
 	</div>
-{:else if !homeData}
-	<!-- Full Page Skeleton - Shows immediately while data loads -->
-	<div class="min-h-screen">
-		<!-- Hero Skeleton - Takes up full viewport height naturally -->
-		<section class="relative h-screen w-full overflow-hidden">
-			<div
-				class="absolute inset-0 animate-pulse bg-gradient-to-b from-muted/30 via-muted/50 to-muted"
-			></div>
-
-			<!-- Hero content skeleton -->
-			<div class="relative z-10 flex h-full items-center">
-				<div class="container mx-auto px-6">
-					<div
-						class="flex flex-col-reverse items-center gap-4 md:gap-8 lg:flex-row lg:justify-between lg:gap-16 xl:gap-20"
-					>
-						<div class="max-w-3xl flex-1 space-y-6">
-							<!-- Trending badge skeleton -->
-							<div class="mb-6 hidden md:block">
-								<Skeleton class="h-10 w-32 rounded-full" />
-							</div>
-
-							<!-- Title skeleton -->
-							<Skeleton class="h-16 w-3/4 sm:h-20 md:h-24 lg:h-32" />
-
-							<!-- Subtitle skeleton -->
-							<Skeleton class="hidden h-8 w-1/2 sm:block md:h-10" />
-
-							<!-- Season badge skeleton -->
-							<Skeleton class="hidden h-10 w-40 rounded-full sm:block" />
-
-							<!-- Genre buttons skeleton -->
-							<div class="flex flex-wrap gap-2">
-								{#each Array(4) as _, i (i)}
-									<Skeleton class="h-8 w-20 rounded-full" />
-								{/each}
-							</div>
-
-							<!-- Action buttons skeleton -->
-							<div class="flex flex-col gap-3 sm:flex-row sm:gap-4">
-								<Skeleton class="h-12 w-40" />
-								<Skeleton class="h-12 w-32" />
-							</div>
-						</div>
-
-						<!-- Featured image skeleton -->
-						<div class="lg:flex-shrink-0">
-							<Skeleton
-								class="aspect-[2/3] w-[45vw] rounded-2xl md:w-[300px] lg:h-[550px] lg:w-96"
-							/>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- Content Skeletons - Now naturally follows the hero -->
-		<div class="container mx-auto space-y-12 px-4 py-12">
-			<!-- Trending Skeleton -->
-			<div class="space-y-4">
-				<Skeleton class="h-8 w-40" />
-				<div
-					class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-				>
-					{#each Array(6) as _, i (i)}
-						<div class="space-y-3">
-							<div
-								class="relative overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 shadow-lg"
-							>
-								<Skeleton class="aspect-[3/4] w-full" />
-								<div class="absolute top-3 left-3">
-									<Skeleton class="h-6 w-12 rounded-md" />
-								</div>
-							</div>
-							<Skeleton class="h-4 w-full" />
-							<Skeleton class="h-3 w-2/3" />
-						</div>
-					{/each}
-				</div>
-			</div>
-
-			<!-- Continue Watching Skeleton (only if logged in) -->
-			{#if isLoggedIn}
-				<div class="space-y-4">
-					<Skeleton class="h-8 w-48" />
-					<div
-						class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-					>
-						{#each Array(6) as _, i (i)}
-							<div class="space-y-3">
-								<div
-									class="relative overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 shadow-lg"
-								>
-									<Skeleton class="aspect-[3/4] w-full" />
-								</div>
-								<Skeleton class="h-4 w-full" />
-								<Skeleton class="h-3 w-2/3" />
-							</div>
-						{/each}
-					</div>
-				</div>
-
-				<!-- Planning Skeleton -->
-				<div class="space-y-4">
-					<Skeleton class="h-8 w-32" />
-					<div
-						class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-					>
-						{#each Array(6) as _, i (i)}
-							<div class="space-y-3">
-								<div
-									class="relative overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 shadow-lg"
-								>
-									<Skeleton class="aspect-[3/4] w-full" />
-								</div>
-								<Skeleton class="h-4 w-full" />
-								<Skeleton class="h-3 w-2/3" />
-							</div>
-						{/each}
-					</div>
-				</div>
-			{/if}
-
-			<!-- Popular Skeleton -->
-			<div class="space-y-4">
-				<Skeleton class="h-8 w-36" />
-				<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{#each Array(8) as _, i (i)}
-						<div
-							class="flex gap-4 rounded-xl border bg-card/50 p-5 transition-all hover:border-primary/20"
-						>
-							<div class="relative overflow-hidden rounded-lg shadow-md">
-								<Skeleton class="aspect-[3/4] w-20" />
-								<div class="absolute top-1 right-1">
-									<Skeleton class="h-5 w-8 rounded" />
-								</div>
-							</div>
-							<div class="flex-1 space-y-3">
-								<Skeleton class="h-4 w-3/4" />
-								<Skeleton class="h-3 w-1/2" />
-								<Skeleton class="h-3 w-1/3" />
-							</div>
-						</div>
-					{/each}
-				</div>
-			</div>
-
-			<!-- Seasonal Skeleton -->
-			<div class="space-y-4">
-				<Skeleton class="h-8 w-28" />
-				<div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-					{#each Array(6) as _, i (i)}
-						<div
-							class="overflow-hidden rounded-2xl bg-gradient-to-br from-muted to-muted/50 shadow-lg"
-						>
-							<div class="relative">
-								<Skeleton class="h-48 w-full" />
-								<div class="absolute top-4 right-4">
-									<Skeleton class="h-8 w-28 rounded-md" />
-								</div>
-							</div>
-							<div class="space-y-4 p-6">
-								<div class="flex gap-4">
-									<div class="relative overflow-hidden rounded-lg shadow-md">
-										<Skeleton class="h-24 w-16" />
-									</div>
-									<div class="flex-1 space-y-3">
-										<Skeleton class="h-4 w-3/4" />
-										<Skeleton class="h-3 w-1/2" />
-										<div class="flex flex-wrap gap-1">
-											<Skeleton class="h-6 w-16 rounded-full" />
-											<Skeleton class="h-6 w-16 rounded-full" />
-										</div>
-									</div>
-								</div>
-								<Skeleton class="h-20 w-full" />
-							</div>
-						</div>
-					{/each}
-				</div>
-			</div>
-
-			<!-- Recently Updated Skeleton -->
-			<div class="space-y-4">
-				<Skeleton class="h-8 w-44" />
-				<div
-					class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-				>
-					{#each Array(6) as _, i (i)}
-						<div class="space-y-3">
-							<div
-								class="relative overflow-hidden rounded-xl bg-gradient-to-br from-muted to-muted/50 shadow-lg"
-							>
-								<Skeleton class="aspect-[3/4] w-full" />
-								<div class="absolute top-3 left-3">
-									<Skeleton class="h-6 w-10 rounded-full" />
-								</div>
-							</div>
-							<Skeleton class="h-4 w-full" />
-							<Skeleton class="h-3 w-2/3" />
-						</div>
-					{/each}
-				</div>
-			</div>
-		</div>
-	</div>
 {:else}
 	<!-- Real Content - Only renders when data is ready -->
 	{#if featuredAnime}
-		<section class="absolute top-0 right-0 left-0 z-10 mb-16 h-screen w-screen overflow-hidden">
+		<section
+			class="relative z-10 -mt-16 mb-12 h-screen min-h-screen w-screen overflow-hidden md:-mt-20"
+		>
 			<div class="absolute inset-0">
 				<img
 					src={featuredAnime.metadata?.mainPictureUrl || featuredAnime.imageUrl}
@@ -368,7 +171,7 @@
 									<img
 										src={featuredAnime.metadata?.mainPictureUrl || featuredAnime.imageUrl}
 										alt={featuredAnime.ename || featuredAnime.jname}
-										class="aspect-[2/3] w-[45vw] overflow-hidden rounded-2xl object-cover md:w-[300px] lg:h-[550px] lg:w-96"
+										class="aspect-[2/3] w-[45vw] min-w-3xs overflow-hidden rounded-2xl object-cover md:w-[300px] lg:h-[550px] lg:w-96"
 									/>
 								</div>
 								<div
@@ -393,7 +196,7 @@
 		</section>
 	{/if}
 
-	<div class="container mx-auto mt-[100vh] space-y-12 px-4">
+	<div class="container mx-auto space-y-12 px-4">
 		<AnimeSection icon={TrendingUp} title="Trending Anime" visible={trending.length > 0}>
 			{#each trending.slice(1, 7) as anime, index (anime.id)}
 				<AnimeCard {anime} class="w-40 flex-shrink-0 md:w-auto">

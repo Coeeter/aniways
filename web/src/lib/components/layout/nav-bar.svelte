@@ -63,7 +63,7 @@
 
 <header
 	id="navbar"
-	class="border-b border-border bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/60"
+	class="flex h-16 items-center border-b border-border bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 md:h-20"
 >
 	<div class="container mx-auto p-4">
 		<div class="flex items-center justify-between">
