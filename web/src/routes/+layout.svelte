@@ -20,16 +20,7 @@
 	const layoutState = setLayoutStateContext();
 
 	let theme = $derived(appState.settings?.theme);
-
-	function identifyUser() {
-		const user = appState.user;
-		if (!user) return;
-		posthog.identify(user.id, {
-			username: user.username,
-			email: user.email,
-			environment: PUBLIC_APP_ENV || 'development',
-		});
-	}
+	let lastIdentifiedUserId: string | null = null;
 
 	$effect(() => {
 		if (!theme) return;
@@ -41,22 +32,29 @@
 		appState.setSettings(data.settings);
 	});
 
-	$effect(() => {
-		if (appState.user) {
-			identifyUser();
-		}
-	});
-
 	onMount(() => {
 		initAnalytics();
-		capturePageview(window.location.href);
-		identifyUser();
+	});
+
+	$effect(() => {
+		if (!appState.user) return;
+
+		if (lastIdentifiedUserId === appState.user.id) return; // Avoid re-identifying the same user
+
+		posthog.identify(appState.user.id, {
+			username: appState.user.username,
+			email: appState.user.email,
+			environment: PUBLIC_APP_ENV || 'development',
+		});
+
+		lastIdentifiedUserId = appState.user.id;
 	});
 
 	afterNavigate(({ to }) => {
-		if (to?.url) {
-			capturePageview(to.url.href);
-		}
+		const toUrl = to?.url?.href;
+		if (!toUrl) return;
+
+		capturePageview(toUrl);
 	});
 </script>
 
