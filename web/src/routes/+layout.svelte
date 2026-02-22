@@ -20,6 +20,15 @@
 
 	let theme = $derived(appState.settings?.theme);
 
+	function identifyUser() {
+		const user = appState.user;
+		if (!user) return;
+		posthog.identify(user.id, {
+			username: user.username,
+			email: user.email,
+		});
+	}
+
 	$effect(() => {
 		if (!theme) return;
 		document.documentElement.className = cn('dark', theme.className);
@@ -31,17 +40,15 @@
 	});
 
 	$effect(() => {
-		const user = appState.user;
-		if (!user) return;
-		posthog.identify(user.id, {
-			username: user.username,
-			email: user.email,
-		});
+		if (appState.user) {
+			identifyUser();
+		}
 	});
 
 	onMount(() => {
 		initAnalytics();
 		capturePageview(window.location.href);
+		identifyUser();
 	});
 
 	afterNavigate(({ to }) => {
