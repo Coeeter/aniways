@@ -2,6 +2,7 @@
 	import posthog from 'posthog-js';
 	import { onMount } from 'svelte';
 	import { afterNavigate } from '$app/navigation';
+	import { PUBLIC_APP_ENV } from '$env/static/public';
 	import { capturePageview, initAnalytics } from '$lib/analytics';
 	import Footer from '$lib/components/layout/footer.svelte';
 	import NavBar from '$lib/components/layout/nav-bar.svelte';
@@ -26,6 +27,7 @@
 		posthog.identify(user.id, {
 			username: user.username,
 			email: user.email,
+			environment: PUBLIC_APP_ENV || 'development',
 		});
 	}
 
