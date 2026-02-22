@@ -3,13 +3,6 @@ import { PUBLIC_APP_ENV, PUBLIC_POSTHOG_HOST, PUBLIC_POSTHOG_KEY } from '$env/st
 
 export type { PostHog } from 'posthog-js';
 
-// ---------------------------------------------------------------------------
-// Breadcrumb trail
-// A circular buffer of the last N user actions. Every capture* call adds an
-// entry. When an error fires, the full trail is attached so you can see
-// exactly what the user did before the error hit.
-// ---------------------------------------------------------------------------
-
 type Breadcrumb = {
 	timestamp: string; // ISO
 	action: string; // event name, e.g. 'anime_viewed'
@@ -38,43 +31,22 @@ export function getBreadcrumbs(): Breadcrumb[] {
 	return [...breadcrumbs];
 }
 
-// ---------------------------------------------------------------------------
-// Init
-// ---------------------------------------------------------------------------
-
-/**
- * Initialise PostHog once for the lifetime of the browser session.
- * Must only be called client-side (inside onMount / $effect).
- */
 export function initAnalytics() {
 	if (typeof window === 'undefined') return;
 	if (!PUBLIC_POSTHOG_KEY || PUBLIC_POSTHOG_KEY.includes('REPLACE')) return;
 
 	posthog.init(PUBLIC_POSTHOG_KEY, {
 		api_host: PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
-		// Capture pageviews manually via afterNavigate so SPA route changes are tracked
 		capture_pageview: false,
-		// Keep sessions alive for 30 minutes of inactivity
 		session_idle_timeout_seconds: 1800,
-		// Persist the anonymous device ID across sessions
 		persistence: 'localStorage+cookie',
 	});
 
-	// Register environment as a super property — attached to every event automatically.
-	// Filter by environment = 'production' vs 'development' in the PostHog dashboard.
 	posthog.register({
 		environment: PUBLIC_APP_ENV || 'development',
 	});
 }
 
-// ---------------------------------------------------------------------------
-// Identity
-// ---------------------------------------------------------------------------
-
-/**
- * Identify a logged-in user. Call after login or on app boot when already
- * authenticated. Pass null to reset (logout).
- */
 export function identifyUser(user: { id: string; username: string; email: string } | null) {
 	if (typeof window === 'undefined') return;
 
@@ -88,28 +60,6 @@ export function identifyUser(user: { id: string; username: string; email: string
 		email: user.email,
 	});
 }
-
-// ---------------------------------------------------------------------------
-// Helpers — current user context (attached to every error event)
-// ---------------------------------------------------------------------------
-
-function getCurrentUserContext() {
-	// posthog.get_distinct_id() returns either the user's ID (after identify())
-	// or the anonymous device ID. Either way it's useful for error correlation.
-	try {
-		return {
-			distinct_id: posthog.get_distinct_id?.() ?? 'unknown',
-			is_identified: posthog.get_property?.('$user_id') != null,
-			username: posthog.get_property?.('username') ?? null,
-		};
-	} catch {
-		return { distinct_id: 'unknown', is_identified: false, username: null };
-	}
-}
-
-// ---------------------------------------------------------------------------
-// Event capture helpers — all strongly typed, all add a breadcrumb
-// ---------------------------------------------------------------------------
 
 export function capturePageview(url: string) {
 	addBreadcrumb('pageview', url);
@@ -185,14 +135,12 @@ export function captureListItemUpdated(props: {
 	status: string;
 	watched_episodes: number;
 }) {
-	addBreadcrumb('list_item_updated', `${props.anime_id} → ${props.status} (${props.watched_episodes} eps)`);
+	addBreadcrumb(
+		'list_item_updated',
+		`${props.anime_id} → ${props.status} (${props.watched_episodes} eps)`,
+	);
 	posthog.capture('list_item_updated', props);
 }
-
-// ---------------------------------------------------------------------------
-// Error capture — the rich version
-// Attaches: page, user context, last N breadcrumbs, stack trace if available
-// ---------------------------------------------------------------------------
 
 export function captureServerSwitch(props: {
 	anime_id: string;
@@ -261,11 +209,6 @@ export function captureResumeClicked(props: {
 	posthog.capture('resume_clicked', props);
 }
 
-/**
- * Capture an API-level error (5xx responses from the backend).
- * Uses posthog.captureException() so it appears in PostHog's Error Tracking UI
- * alongside JS exceptions, with the breadcrumb trail attached as context.
- */
 export function captureApiError(props: {
 	error_message: string;
 	status_code: number;

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ArrowLeft, LogOut, Sparkles } from 'lucide-svelte';
+	import posthog from 'posthog-js';
 	import { toast } from 'svelte-sonner';
 	import { goto, invalidate } from '$app/navigation';
 	import { apiClient } from '$lib/api/client';
@@ -11,6 +12,7 @@
 		isLoggingOut = true;
 		try {
 			await apiClient.POST('/auth/logout');
+			posthog.reset();
 			await invalidate('app:user');
 			await goto('/');
 			toast.success('Successfully logged out');

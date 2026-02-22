@@ -1,11 +1,12 @@
 <script lang="ts">
+	import posthog from 'posthog-js';
 	import { onMount } from 'svelte';
 	import { afterNavigate } from '$app/navigation';
+	import { capturePageview, initAnalytics } from '$lib/analytics';
 	import Footer from '$lib/components/layout/footer.svelte';
 	import NavBar from '$lib/components/layout/nav-bar.svelte';
 	import TopLoader from '$lib/components/layout/top-loader.svelte';
 	import Sonner from '$lib/components/ui/sonner/sonner.svelte';
-	import { capturePageview, identifyUser, initAnalytics } from '$lib/analytics';
 	import { setLayoutStateContext } from '$lib/context/layout.svelte';
 	import { setAppStateContext } from '$lib/context/state.svelte';
 	import { getFontUrlsForTheme } from '$lib/themes';
@@ -29,25 +30,20 @@
 		appState.setSettings(data.settings);
 	});
 
-	// Identify / de-identify when the user state changes
 	$effect(() => {
 		const user = appState.user;
-		if (user) {
-			identifyUser({ id: user.id, username: user.username, email: user.email });
-		} else {
-			identifyUser(null);
-		}
+		if (!user) return;
+		posthog.identify(user.id, {
+			username: user.username,
+			email: user.email,
+		});
 	});
 
 	onMount(() => {
 		initAnalytics();
-		// Capture the first pageview after PostHog is ready
 		capturePageview(window.location.href);
-		// JS errors and unhandled rejections are captured via hooks.client.ts
-		// using posthog.captureException(), which feeds PostHog's Error Tracking UI
 	});
 
-	// Track SPA pageviews on every client-side navigation
 	afterNavigate(({ to }) => {
 		if (to?.url) {
 			capturePageview(to.url.href);

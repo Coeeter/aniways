@@ -5,9 +5,9 @@
 	import { defaults, setError, superForm } from 'sveltekit-superforms';
 	import { arktype, arktypeClient } from 'sveltekit-superforms/adapters';
 	import { goto, invalidate } from '$app/navigation';
+	import { captureUserLoggedIn } from '$lib/analytics';
 	import { apiClient } from '$lib/api/client';
 	import type { components } from '$lib/api/openapi';
-	import { captureUserLoggedIn, identifyUser } from '$lib/analytics';
 	import * as Form from '$lib/components/ui/form';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { cn } from '$lib/utils';
@@ -29,13 +29,6 @@
 
 				if (res.response.status === 200 && res.data) {
 					captureUserLoggedIn();
-					if (res.data.id) {
-						identifyUser({
-							id: res.data.id,
-							username: res.data.username ?? '',
-							email: form.data.email,
-						});
-					}
 					await invalidate('app:user');
 					await goto('/');
 					toast.success('Successfully logged in');
