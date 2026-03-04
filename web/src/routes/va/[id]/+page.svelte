@@ -6,10 +6,13 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Pagination } from '$lib/components/ui/pagination';
+	import { language } from '$lib/stores/language';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	let person = $derived(data.person!);
+	const languageValue = $derived($language);
 
 	let currentCharacterPage = $state(1);
 	let currentAnimePage = $state(1);
@@ -154,7 +157,7 @@
 										{character.character.name}
 									</h3>
 									<p class="line-clamp-1 text-sm text-muted-foreground">
-										{character.anime.ename || character.anime.jname}
+									{getLocalizedTitles(character.anime, languageValue).main}
 									</p>
 									<div class="mt-2 flex flex-wrap items-center gap-2">
 										<Badge variant="secondary" class="text-xs">
@@ -198,19 +201,19 @@
 							>
 								<img
 									src={animeWork.anime.imageUrl}
-									alt={animeWork.anime.ename || animeWork.anime.jname}
+								alt={getLocalizedTitles(animeWork.anime, languageValue).main}
 									class="h-20 w-14 flex-shrink-0 rounded object-cover"
 									loading="lazy"
 								/>
 								<div class="min-w-0 flex-1 overflow-hidden">
 									<h3 class="line-clamp-2 font-semibold group-hover:text-primary">
-										{animeWork.anime.ename || animeWork.anime.jname}
+									{getLocalizedTitles(animeWork.anime, languageValue).main}
 									</h3>
-									{#if animeWork.anime.jname && animeWork.anime.ename}
-										<p class="line-clamp-1 text-sm text-muted-foreground">
-											{animeWork.anime.jname}
-										</p>
-									{/if}
+								{#if getLocalizedTitles(animeWork.anime, languageValue).sub}
+									<p class="line-clamp-1 text-sm text-muted-foreground">
+										{getLocalizedTitles(animeWork.anime, languageValue).sub}
+									</p>
+								{/if}
 									<p class="my-3 text-xs text-muted-foreground">
 										{animeWork.position.replace('add', '').trim()}
 									</p>

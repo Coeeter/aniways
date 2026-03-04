@@ -2,13 +2,16 @@
 	import { LoaderCircle, Search } from 'lucide-svelte';
 	import { Debounced, resource, watch } from 'runed';
 	import { onNavigate } from '$app/navigation';
-	import { apiClient } from '$lib/api/client';
 	import { captureSearch } from '$lib/analytics';
+	import { apiClient } from '$lib/api/client';
+	import { language } from '$lib/stores/language';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { Button } from '../ui/button';
 	import * as Command from '../ui/command';
 
 	let isSearchOpen = $state(false);
 	let rawQuery = $state('');
+	const languageValue = $derived($language);
 	const debouncedQuery = new Debounced(() => rawQuery, 700);
 
 	const trendingResource = resource(
@@ -123,26 +126,26 @@
 				{:else}
 					{#each searchResource.current as anime (anime.id)}
 						<Command.LinkItem
-							value={anime.ename || anime.jname}
+						value={getLocalizedTitles(anime, languageValue).main}
 							class="flex cursor-pointer items-center gap-3 p-3 hover:bg-accent"
 							href="/anime/{anime.id}"
 						>
 							<div class="relative h-16 w-12 flex-shrink-0 overflow-hidden rounded-md">
 								<img
 									src={anime.imageUrl}
-									alt={anime.jname || anime.ename}
+							alt={getLocalizedTitles(anime, languageValue).main}
 									class="h-full w-full object-cover"
 								/>
 							</div>
 							<div class="min-w-0 flex-1">
 								<div class="line-clamp-1 font-medium">
-									{anime.jname || anime.ename}
+								{getLocalizedTitles(anime, languageValue).main}
 								</div>
-								{#if anime.jname && anime.ename}
-									<div class="line-clamp-1 text-sm text-muted-foreground">
-										{anime.ename}
-									</div>
-								{/if}
+							{#if getLocalizedTitles(anime, languageValue).sub}
+								<div class="line-clamp-1 text-sm text-muted-foreground">
+									{getLocalizedTitles(anime, languageValue).sub}
+								</div>
+							{/if}
 								<div class="flex items-center gap-2 text-xs text-muted-foreground">
 									<span class="capitalize">{anime.season} {anime.seasonYear}</span>
 									{#if anime.genre}

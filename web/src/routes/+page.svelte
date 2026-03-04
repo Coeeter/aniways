@@ -6,12 +6,16 @@
 	import AnimeCard from '$lib/components/anime/display/anime-card.svelte';
 	import AnimeSection from '$lib/components/anime/layout/anime-section.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { language } from '$lib/stores/language';
 	import { cn } from '$lib/utils';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
 	const isLoggedIn = $derived(data.isLoggedIn);
+
+	const languageValue = $derived($language);
 
 	// Fetch homepage data client-side using runed resource
 	const library = resource(
@@ -82,7 +86,7 @@
 			<div class="absolute inset-0">
 				<img
 					src={featuredAnime.metadata?.mainPictureUrl || featuredAnime.imageUrl}
-					alt={featuredAnime.ename || featuredAnime.jname}
+					alt={getLocalizedTitles(featuredAnime, languageValue).main}
 					class="absolute inset-0 h-full w-full scale-110 object-cover blur-sm"
 				/>
 				<div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20"></div>
@@ -110,13 +114,13 @@
 							<h1
 								class="mb-3 line-clamp-2 text-3xl leading-tight font-black tracking-tight text-foreground sm:mb-6 sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl"
 							>
-								{featuredAnime.jname || featuredAnime.ename}
+								{getLocalizedTitles(featuredAnime, languageValue).main}
 							</h1>
-							{#if featuredAnime.ename && featuredAnime.jname}
+							{#if getLocalizedTitles(featuredAnime, languageValue).sub}
 								<p
 									class="mb-4 hidden text-xl font-light text-muted-foreground sm:mb-6 sm:block md:text-2xl lg:text-3xl"
 								>
-									{featuredAnime.ename}
+									{getLocalizedTitles(featuredAnime, languageValue).sub}
 								</p>
 							{/if}
 							<a
@@ -170,7 +174,7 @@
 								<div class="relative overflow-hidden rounded-2xl pt-12 shadow-2xl md:pt-0">
 									<img
 										src={featuredAnime.metadata?.mainPictureUrl || featuredAnime.imageUrl}
-										alt={featuredAnime.ename || featuredAnime.jname}
+										alt={getLocalizedTitles(featuredAnime, languageValue).main}
 										class="aspect-[2/3] w-[45vw] min-w-3xs overflow-hidden rounded-2xl object-cover md:w-[300px] lg:h-[550px] lg:w-96"
 									/>
 								</div>
@@ -257,7 +261,7 @@
 						>
 							<img
 								src={anime.imageUrl}
-								alt={anime.ename || anime.jname}
+								alt={getLocalizedTitles(anime, languageValue).main}
 								class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
 							/>
 							<div
@@ -278,7 +282,7 @@
 								<h3
 									class="mb-1 line-clamp-1 text-base font-semibold transition-colors duration-300 group-hover:text-primary"
 								>
-									{anime.ename || anime.jname}
+									{getLocalizedTitles(anime, languageValue).main}
 								</h3>
 								<div class="text-sm text-muted-foreground capitalize">
 									{anime.season}
@@ -327,7 +331,7 @@
 						<div class="relative h-48 overflow-hidden">
 							<img
 								src={seasonalAnime.bannerImageUrl}
-								alt={seasonalAnime.anime.ename || seasonalAnime.anime.jname}
+								alt={getLocalizedTitles(seasonalAnime.anime, languageValue).main}
 								class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
 							/>
 							<div
@@ -347,7 +351,7 @@
 								<div class="relative h-24 w-16 flex-shrink-0 overflow-hidden rounded-lg">
 									<img
 										src={seasonalAnime.anime.imageUrl}
-										alt={seasonalAnime.anime.ename || seasonalAnime.anime.jname}
+										alt={getLocalizedTitles(seasonalAnime.anime, languageValue).main}
 										class="h-full w-full object-cover"
 									/>
 								</div>
@@ -356,7 +360,7 @@
 									<h3
 										class="mb-2 line-clamp-1 text-lg font-bold transition-colors duration-300 group-hover:text-primary"
 									>
-										{seasonalAnime.anime.ename || seasonalAnime.anime.jname}
+										{getLocalizedTitles(seasonalAnime.anime, languageValue).main}
 									</h3>
 									<div class="mb-2 text-sm text-muted-foreground capitalize">
 										{seasonalAnime.anime.season}

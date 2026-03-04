@@ -1,5 +1,5 @@
-import posthog from 'posthog-js';
 import type { HandleClientError } from '@sveltejs/kit';
+import posthog from 'posthog-js';
 import { getBreadcrumbs } from '$lib/analytics';
 
 export const handleError: HandleClientError = ({ error, status, message }) => {

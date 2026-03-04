@@ -5,10 +5,14 @@
 	import HeroSection from '$lib/components/anime/layout/hero-section.svelte';
 	import InfoSidebar from '$lib/components/anime/layout/info-sidebar.svelte';
 	import TabContent from '$lib/components/anime/layout/tab-content.svelte';
+	import { language } from '$lib/stores/language';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	const languageValue = $derived($language);
+	const titles = $derived.by(() => getLocalizedTitles(data.anime, languageValue));
 
 	const tabs = ['overview', 'episodes', 'relations'] as const;
 	let selectedTab = $derived.by(() => {
@@ -19,7 +23,7 @@
 	onMount(() => {
 		captureAnimeViewed({
 			anime_id: data.anime.id,
-			anime_title: data.anime.jname || data.anime.ename || '',
+			anime_title: titles.main,
 			genres: data.anime.genre ? data.anime.genre.split(', ') : [],
 			season: data.anime.season || '',
 			season_year: data.anime.seasonYear ?? null,
@@ -29,8 +33,8 @@
 </script>
 
 <svelte:head>
-	<title>{data.anime.jname || data.anime.ename} - Aniways</title>
-	<meta name="description" content={`Watch ${data.anime.jname || data.anime.ename} on Aniways`} />
+	<title>{titles.main} - Aniways</title>
+	<meta name="description" content={`Watch ${titles.main} on Aniways`} />
 </svelte:head>
 
 <HeroSection

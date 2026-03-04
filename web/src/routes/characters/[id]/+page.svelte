@@ -5,10 +5,13 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+	import { language } from '$lib/stores/language';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	let character = $derived(data.character!);
+	const languageValue = $derived($language);
 
 	let filteredVAs = $derived.by(() => {
 		if (!character.voices) return [];
@@ -138,19 +141,19 @@
 							>
 								<img
 									src={animeAppearance.anime.imageUrl}
-									alt={animeAppearance.anime.ename || animeAppearance.anime.jname}
+							alt={getLocalizedTitles(animeAppearance.anime, languageValue).main}
 									class="h-20 w-14 flex-shrink-0 rounded object-cover"
 									loading="lazy"
 								/>
 								<div class="min-w-0 flex-1">
 									<h3 class="line-clamp-2 font-semibold group-hover:text-primary">
-										{animeAppearance.anime.ename || animeAppearance.anime.jname}
+								{getLocalizedTitles(animeAppearance.anime, languageValue).main}
 									</h3>
-									{#if animeAppearance.anime.jname && animeAppearance.anime.ename}
-										<p class="line-clamp-1 text-sm text-muted-foreground">
-											{animeAppearance.anime.jname}
-										</p>
-									{/if}
+							{#if getLocalizedTitles(animeAppearance.anime, languageValue).sub}
+								<p class="line-clamp-1 text-sm text-muted-foreground">
+									{getLocalizedTitles(animeAppearance.anime, languageValue).sub}
+								</p>
+							{/if}
 									<div class="mt-2 flex items-center gap-2">
 										<Badge variant="secondary" class="text-xs">
 											{animeAppearance.role}

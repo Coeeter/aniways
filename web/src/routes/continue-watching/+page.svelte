@@ -5,9 +5,12 @@
 	import EmptyState from '$lib/components/anime/display/empty-state.svelte';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { Pagination } from '$lib/components/ui/pagination';
+	import { language } from '$lib/stores/language';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	const languageValue = $derived($language);
 </script>
 
 <svelte:head>
@@ -44,7 +47,7 @@
 						onclick={() =>
 							captureResumeClicked({
 								anime_id: item.anime.id,
-								anime_title: item.anime.jname || item.anime.ename || '',
+						anime_title: getLocalizedTitles(item.anime, languageValue).main,
 								resume_episode: item.watchedEpisodes + 1,
 							})}
 					/>

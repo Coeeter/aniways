@@ -7,7 +7,9 @@
 
 	const appState = getAppStateContext();
 
-	function toggleSetting(key: 'autoPlayEpisode' | 'autoNextEpisode' | 'autoResumeEpisode' | 'incognitoMode') {
+	function toggleSetting(
+		key: 'autoPlayEpisode' | 'autoNextEpisode' | 'autoResumeEpisode' | 'incognitoMode',
+	) {
 		const newValue = appState.toggleSetting(key);
 		captureSettingToggled({ setting: key, new_value: newValue ?? false });
 	}

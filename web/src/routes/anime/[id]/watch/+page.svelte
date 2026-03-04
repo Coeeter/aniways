@@ -24,11 +24,15 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { getAppStateContext } from '$lib/context/state.svelte';
+	import { language } from '$lib/stores/language';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { cn } from '$lib/utils';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	const appState = getAppStateContext();
+	const languageValue = $derived($language);
+	const titles = $derived.by(() => getLocalizedTitles(data.anime, languageValue));
 
 	let selectedServer = $derived(data.servers[0] || null);
 
@@ -124,11 +128,11 @@
 
 <svelte:head>
 	<title>
-		{data.anime.jname || data.anime.ename} - Episode {data.episodeNumber} - Aniways
+		{titles.main} - Episode {data.episodeNumber} - Aniways
 	</title>
 	<meta
 		name="description"
-		content="Watch {data.anime.jname || data.anime.ename} Episode {data.episodeNumber} on Aniways"
+		content="Watch {titles.main} Episode {data.episodeNumber} on Aniways"
 	/>
 </svelte:head>
 
@@ -142,7 +146,7 @@
 			</Button>
 			<div class="min-w-0 flex-1">
 				<h1 class="line-clamp-1 text-lg font-semibold">
-					{data.anime.jname || data.anime.ename}
+					{titles.main}
 				</h1>
 				<p class="text-sm text-muted-foreground">
 					Episode {data.episodeNumber}: {data.currentEpisode.title ||
@@ -193,7 +197,7 @@
 								if (next && next.serverId !== selectedServer?.serverId) {
 									captureServerSwitch({
 										anime_id: data.anime.id,
-										anime_title: data.anime.jname || data.anime.ename || '',
+									anime_title: titles.main,
 										episode_number: data.episodeNumber,
 										from_server: selectedServer?.serverName ?? 'unknown',
 										to_server: next.serverName,
@@ -223,7 +227,7 @@
 						{nextEpisodeUrl}
 						{updateLibrary}
 						animeId={data.anime.id}
-						animeTitle={data.anime.jname || data.anime.ename || ''}
+									animeTitle={titles.main}
 						episodeNumber={data.episodeNumber}
 						serverName={selectedServer?.serverName ?? 'unknown'}
 						streamType={selectedServer?.type?.toLowerCase() ?? 'unknown'}
@@ -268,7 +272,7 @@
 											return;
 										captureServerSwitch({
 											anime_id: data.anime.id,
-											anime_title: data.anime.jname || data.anime.ename || '',
+										anime_title: titles.main,
 											episode_number: data.episodeNumber,
 											from_server: selectedServer?.serverName ?? 'unknown',
 											to_server: server.serverName,
@@ -293,16 +297,16 @@
 			<div class="flex items-start gap-4">
 				<img
 					src={data.anime.imageUrl}
-					alt={data.anime.jname || data.anime.ename}
+						alt={titles.main}
 					class="h-24 w-16 rounded object-cover"
 				/>
 				<div class="flex-1 space-y-2">
 					<div>
 						<h2 class="line-clamp-1 text-lg font-bold">
-							{data.anime.jname || data.anime.ename}
+							{titles.main}
 						</h2>
-						{#if data.anime.ename && data.anime.jname}
-							<p class="line-clamp-1 text-sm text-muted-foreground">{data.anime.ename}</p>
+						{#if titles.sub}
+							<p class="line-clamp-1 text-sm text-muted-foreground">{titles.sub}</p>
 						{/if}
 					</div>
 					<div class="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">

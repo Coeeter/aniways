@@ -3,7 +3,9 @@
 	import type { Snippet } from 'svelte';
 	import type { components } from '$lib/api/openapi';
 	import LibraryBtn from '$lib/components/anime/controls/library-btn.svelte';
+	import { language } from '$lib/stores/language';
 	import { cn } from '$lib/utils';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 
 	type AnimeResponse = components['schemas']['models.AnimeResponse'];
 	type LibraryResponse = components['schemas']['models.LibraryResponse'];
@@ -17,11 +19,18 @@
 		onclick?: () => void;
 	}
 
-	let { anime, topLeftBadge, libraryEntry, episodeLink = null, class: className, onclick: onCardClick }: Props = $props();
-
+	let {
+		anime,
+		topLeftBadge,
+		libraryEntry,
+		episodeLink = null,
+		class: className,
+		onclick: onCardClick,
+	}: Props = $props();
 	let linkUrl = $derived(
 		episodeLink ? `/anime/${anime.id}/watch?ep=${episodeLink}` : `/anime/${anime.id}`,
 	);
+	let titles = $derived.by(() => getLocalizedTitles(anime, $language));
 </script>
 
 <a
@@ -43,7 +52,7 @@
 	>
 		<img
 			src={anime.imageUrl}
-			alt={anime.jname || anime.ename}
+			alt={titles.main}
 			class="h-full w-full object-cover transition-all duration-700 group-hover:scale-110"
 		/>
 
@@ -101,7 +110,7 @@
 		<h3
 			class="line-clamp-1 text-sm font-semibold transition-colors duration-300 group-hover:text-primary"
 		>
-			{anime.jname || anime.ename}
+			{titles.main}
 		</h3>
 		{#if episodeLink}
 			<div class="text-xs text-muted-foreground">

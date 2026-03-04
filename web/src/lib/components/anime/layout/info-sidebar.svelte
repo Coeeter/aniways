@@ -3,6 +3,8 @@
 	import { ExternalLink, TrendingUp } from 'lucide-svelte';
 	import type { components } from '$lib/api/openapi';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { language } from '$lib/stores/language';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { cn } from '$lib/utils';
 
 	type AnimeResponse = components['schemas']['models.AnimeWithMetadataResponse'];
@@ -14,6 +16,7 @@
 	}
 
 	let { anime, ratingLabel, selectedTab, variations = [] }: Props = $props();
+	const languageValue = $derived($language);
 	let mediaType = $derived.by(() => {
 		const type = anime.metadata?.mediaType || 'tv';
 		return type === 'tv'
@@ -202,7 +205,7 @@
 					>
 						<img
 							src={variation.imageUrl}
-							alt={variation.jname || variation.ename}
+							alt={getLocalizedTitles(variation, languageValue).main}
 							class="h-16 w-12 rounded object-cover"
 						/>
 						<div class="min-w-0 flex-1">
@@ -213,7 +216,7 @@
 										!isCurrent && 'group-hover:text-primary',
 									)}
 								>
-									{variation.jname || variation.ename}
+								{getLocalizedTitles(variation, languageValue).main}
 								</h4>
 								{#if isCurrent}
 									<span
@@ -223,9 +226,9 @@
 									</span>
 								{/if}
 							</div>
-							{#if variation.ename && variation.jname}
+							{#if getLocalizedTitles(variation, languageValue).sub}
 								<p class="line-clamp-1 text-xs text-muted-foreground">
-									{variation.ename}
+									{getLocalizedTitles(variation, languageValue).sub}
 								</p>
 							{/if}
 						</div>

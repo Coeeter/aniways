@@ -5,6 +5,8 @@
 	import LibraryBtn from '$lib/components/anime/controls/library-btn.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Dialog, DialogContent, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
+	import { language } from '$lib/stores/language';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { cn } from '$lib/utils';
 
 	type AnimeResponse = components['schemas']['models.AnimeWithMetadataResponse'];
@@ -30,6 +32,8 @@
 		libraryEntry,
 		variations = [],
 	}: Props = $props();
+	const languageValue = $derived($language);
+	const titles = $derived.by(() => getLocalizedTitles(anime, languageValue));
 
 	let mediaType = $derived.by(() => {
 		const type = anime.metadata?.mediaType || 'tv';
@@ -70,7 +74,7 @@
 				<div class="group relative -mt-48 overflow-hidden rounded-lg shadow-2xl md:-mt-24">
 					<img
 						src={anime.metadata?.mainPictureUrl || anime.imageUrl}
-						alt={anime.jname || anime.ename}
+					alt={titles.main}
 						class="aspect-[2/3] w-48 object-cover lg:w-56"
 					/>
 					{#if trailer}
@@ -88,11 +92,11 @@
 			<div class="flex-1 space-y-6 md:space-y-4">
 				<div>
 					<h1 class="text-3xl font-bold lg:text-4xl">
-						{anime.jname || anime.ename}
+						{titles.main}
 					</h1>
-					{#if anime.ename && anime.jname}
+					{#if titles.sub}
 						<h2 class="mt-1 text-lg text-muted-foreground">
-							{anime.ename}
+							{titles.sub}
 						</h2>
 					{/if}
 				</div>
@@ -142,7 +146,7 @@
 						{libraryEntry}
 						animeId={anime.id}
 						{variations}
-						currentAnimeName={anime.jname || anime.ename || 'Current Version'}
+						currentAnimeName={titles.main || 'Current Version'}
 					/>
 
 					{#if trailer}
@@ -201,7 +205,7 @@
 	<DialogContent class="max-w-none sm:max-w-none">
 		<DialogHeader>
 			<DialogTitle>
-				Trailer - {anime.jname || anime.ename}
+				Trailer - {titles.main}
 			</DialogTitle>
 		</DialogHeader>
 		{#if trailer}

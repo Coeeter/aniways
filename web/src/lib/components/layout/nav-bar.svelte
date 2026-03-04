@@ -16,6 +16,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import { getAppStateContext } from '$lib/context/state.svelte';
+	import { language, setLanguage } from '$lib/stores/language';
 	import { cn } from '$lib/utils';
 	import BrandText from './brand-text.svelte';
 	import ProfilePicture from './profile-picture.svelte';
@@ -89,6 +90,64 @@
 
 			<div class="flex items-center gap-4">
 				<SearchBar />
+				<div
+					class="hidden items-center gap-0.5 rounded-full border border-border/50 bg-muted/40 px-0.5 py-0.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase sm:flex"
+				>
+					<button
+						class={cn(
+							'rounded-full px-3 py-1 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none',
+							$language === 'jp'
+								? 'bg-primary text-primary-foreground'
+								: 'text-muted-foreground hover:text-foreground',
+						)}
+						onclick={() => setLanguage('jp')}
+						aria-pressed={$language === 'jp'}
+					>
+						JP
+					</button>
+					<button
+						class={cn(
+							'rounded-full px-3 py-1 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none',
+							$language === 'en'
+								? 'bg-primary text-primary-foreground'
+								: 'text-muted-foreground hover:text-foreground',
+						)}
+						onclick={() => setLanguage('en')}
+						aria-pressed={$language === 'en'}
+					>
+						EN
+					</button>
+				</div>
+				<div
+					class="flex items-center gap-0.5 rounded-full border border-border/50 bg-muted/40 px-0.5 py-0.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase sm:hidden"
+				>
+					<button
+						class={cn(
+							'rounded-full px-2.5 py-1 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none',
+							$language === 'jp'
+								? 'bg-primary text-primary-foreground'
+								: 'text-muted-foreground hover:text-foreground',
+						)}
+						onclick={() => setLanguage('jp')}
+						aria-pressed={$language === 'jp'}
+						aria-label="Switch to Japanese"
+					>
+						JP
+					</button>
+					<button
+						class={cn(
+							'rounded-full px-2.5 py-1 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none',
+							$language === 'en'
+								? 'bg-primary text-primary-foreground'
+								: 'text-muted-foreground hover:text-foreground',
+						)}
+						onclick={() => setLanguage('en')}
+						aria-pressed={$language === 'en'}
+						aria-label="Switch to English"
+					>
+						EN
+					</button>
+				</div>
 
 				<Button variant="outline" class="lg:hidden" onclick={() => (isSheetOpen = true)}>
 					<Menu class="h-5 w-5" />

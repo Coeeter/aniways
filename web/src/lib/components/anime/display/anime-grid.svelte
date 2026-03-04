@@ -4,6 +4,8 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Pagination } from '$lib/components/ui/pagination';
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import { language } from '$lib/stores/language';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import type { FilterManager } from '$lib/utils/filter-manager.svelte';
 	import LibraryBtn from '../controls/library-btn.svelte';
 	import AnimeCard from './anime-card.svelte';
@@ -20,6 +22,7 @@
 	}
 
 	let { anime, totalPages, children, empty, filterManager }: Props = $props();
+	const languageValue = $derived($language);
 </script>
 
 <main class="flex-1">
@@ -79,17 +82,19 @@
 						>
 							<img
 								src={a.imageUrl}
-								alt={a.ename || a.jname}
+								alt={getLocalizedTitles(a, languageValue).main}
 								class="h-24 w-20 rounded-md object-cover sm:h-32 sm:w-24"
 							/>
 							<div class="flex-1 space-y-2">
 								<div>
 									<h3 class="line-clamp-2 text-sm font-semibold sm:text-lg">
-										{a.ename || a.jname}
+									{getLocalizedTitles(a, languageValue).main}
 									</h3>
-									{#if a.ename && a.jname}
-										<p class="text-sm text-muted-foreground">{a.jname}</p>
-									{/if}
+								{#if getLocalizedTitles(a, languageValue).sub}
+									<p class="text-sm text-muted-foreground">
+										{getLocalizedTitles(a, languageValue).sub}
+									</p>
+								{/if}
 								</div>
 								<div class="flex flex-wrap gap-2">
 									{#each a.genre.split(', ').slice(0, 5) as genre (genre)}

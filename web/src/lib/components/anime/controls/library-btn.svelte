@@ -14,9 +14,13 @@
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { arktype } from 'sveltekit-superforms/adapters';
 	import { goto, invalidate } from '$app/navigation';
+	import {
+		captureListItemAdded,
+		captureListItemRemoved,
+		captureListItemUpdated,
+	} from '$lib/analytics';
 	import { apiClient } from '$lib/api/client';
 	import type { components } from '$lib/api/openapi';
-	import { captureListItemAdded, captureListItemRemoved, captureListItemUpdated } from '$lib/analytics';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -27,6 +31,8 @@
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import { getAppStateContext } from '$lib/context/state.svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
+	import { language } from '$lib/stores/language';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { cn } from '$lib/utils';
 
 	type LibraryResponse = components['schemas']['models.LibraryResponse'];
@@ -50,6 +56,7 @@
 		currentAnimeName = 'Current Version',
 	}: Props = $props();
 	const appState = getAppStateContext();
+	const languageValue = $derived($language);
 
 	let isOpen = $state(false);
 	let isAdding = $state(false);
@@ -72,16 +79,16 @@
 				return;
 			}
 
-		captureListItemAdded({ anime_id: animeId, list_type: 'watching' });
-		await invalidate('app:library');
-		toast.success('Added to library');
-		isOpen = false;
-	} catch {
-		toast.error('Failed to add to library');
-	} finally {
-		isAdding = false;
-	}
-};
+			captureListItemAdded({ anime_id: animeId, list_type: 'watching' });
+			await invalidate('app:library');
+			toast.success('Added to library');
+			isOpen = false;
+		} catch {
+			toast.error('Failed to add to library');
+		} finally {
+			isAdding = false;
+		}
+	};
 
 	const removeFromLibrary = async () => {
 		if (isDeleting) return;
@@ -97,16 +104,16 @@
 				return;
 			}
 
-		captureListItemRemoved({ anime_id: animeId, list_type: libraryEntry?.status ?? 'unknown' });
-		await invalidate('app:library');
-		toast.success('Removed from library');
-		isOpen = false;
-	} catch {
-		toast.error('Failed to remove from library');
-	} finally {
-		isDeleting = false;
-	}
-};
+			captureListItemRemoved({ anime_id: animeId, list_type: libraryEntry?.status ?? 'unknown' });
+			await invalidate('app:library');
+			toast.success('Removed from library');
+			isOpen = false;
+		} catch {
+			toast.error('Failed to remove from library');
+		} finally {
+			isDeleting = false;
+		}
+	};
 	const checkIfLoggedIn = (fn: () => void) => {
 		if (!appState.isLoggedIn) {
 			toast.error('You must be logged in to use the library', {
@@ -144,18 +151,18 @@
 					return;
 				}
 
-			captureListItemUpdated({
-				anime_id: animeId,
-				status: form.data.status,
-				watched_episodes: form.data.watchedEpisodes,
-			});
-			await invalidate('app:library');
-			toast.success('Library updated');
-			isOpen = false;
-		} catch {
-			toast.error('Failed to update library');
-			cancel();
-		}
+				captureListItemUpdated({
+					anime_id: animeId,
+					status: form.data.status,
+					watched_episodes: form.data.watchedEpisodes,
+				});
+				await invalidate('app:library');
+				toast.success('Library updated');
+				isOpen = false;
+			} catch {
+				toast.error('Failed to update library');
+				cancel();
+			}
 		},
 	});
 
@@ -208,7 +215,7 @@
 							svelte-ignore a11y_label_has_associated_control
 							<label
 								class="mb-2 block text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-								for="version-select"
+								for="version-select-dialog"
 							>
 								Version
 							</label>
@@ -236,18 +243,18 @@
 									}
 								}}
 							>
-								<Select.Trigger class="w-full capitalize" id="version-select">
+								<Select.Trigger class="w-full capitalize" id="version-select-dialog">
 									{currentAnimeName}
 								</Select.Trigger>
 								<Select.Content>
 									{#each variations as variation (variation.id)}
 										{@const isCurrent = variation.id === animeId}
-										<Select.Item value={variation.id} class="capitalize" disabled={isCurrent}>
-											{variation.jname || variation.ename}
-											{#if isCurrent}
-												<span class="ml-2 text-xs text-muted-foreground">(Current)</span>
-											{/if}
-										</Select.Item>
+									<Select.Item value={variation.id} class="capitalize" disabled={isCurrent}>
+										{getLocalizedTitles(variation, languageValue).main}
+										{#if isCurrent}
+											<span class="ml-2 text-xs text-muted-foreground">(Current)</span>
+										{/if}
+									</Select.Item>
 									{/each}
 								</Select.Content>
 							</Select.Root>
@@ -382,6 +389,7 @@
 						<div>
 							<label
 								class="mb-2 block text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+								for="version-select"
 							>
 								Version
 							</label>
@@ -409,18 +417,18 @@
 									}
 								}}
 							>
-								<Select.Trigger class="w-full capitalize">
+								<Select.Trigger class="w-full capitalize" id="version-select">
 									{currentAnimeName}
 								</Select.Trigger>
 								<Select.Content>
 									{#each variations as variation (variation.id)}
 										{@const isCurrent = variation.id === animeId}
-										<Select.Item value={variation.id} class="capitalize" disabled={isCurrent}>
-											{variation.jname || variation.ename}
-											{#if isCurrent}
-												<span class="ml-2 text-xs text-muted-foreground">(Current)</span>
-											{/if}
-										</Select.Item>
+								<Select.Item value={variation.id} class="capitalize" disabled={isCurrent}>
+									{getLocalizedTitles(variation, languageValue).main}
+									{#if isCurrent}
+										<span class="ml-2 text-xs text-muted-foreground">(Current)</span>
+									{/if}
+								</Select.Item>
 									{/each}
 								</Select.Content>
 							</Select.Root>

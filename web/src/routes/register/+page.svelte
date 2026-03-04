@@ -15,9 +15,9 @@
 	import { defaults, setError, superForm } from 'sveltekit-superforms';
 	import { arktype, arktypeClient } from 'sveltekit-superforms/adapters';
 	import { goto } from '$app/navigation';
+	import { captureUserRegistered } from '$lib/analytics';
 	import { apiClient } from '$lib/api/client';
 	import type { components } from '$lib/api/openapi';
-	import { captureUserRegistered } from '$lib/analytics';
 	import * as Form from '$lib/components/ui/form';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { cn } from '$lib/utils';
