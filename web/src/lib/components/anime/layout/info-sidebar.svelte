@@ -4,8 +4,8 @@
 	import type { components } from '$lib/api/openapi';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { language } from '$lib/stores/language';
-	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { cn } from '$lib/utils';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 
 	type AnimeResponse = components['schemas']['models.AnimeWithMetadataResponse'];
 	interface Props {
@@ -216,7 +216,7 @@
 										!isCurrent && 'group-hover:text-primary',
 									)}
 								>
-								{getLocalizedTitles(variation, languageValue).main}
+									{getLocalizedTitles(variation, languageValue).main}
 								</h4>
 								{#if isCurrent}
 									<span

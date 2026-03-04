@@ -6,8 +6,8 @@
 	import InfoSidebar from '$lib/components/anime/layout/info-sidebar.svelte';
 	import TabContent from '$lib/components/anime/layout/tab-content.svelte';
 	import { language } from '$lib/stores/language';
-	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { cn } from '$lib/utils';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();

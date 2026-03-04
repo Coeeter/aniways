@@ -47,7 +47,7 @@
 						onclick={() =>
 							captureResumeClicked({
 								anime_id: item.anime.id,
-						anime_title: getLocalizedTitles(item.anime, languageValue).main,
+								anime_title: getLocalizedTitles(item.anime, languageValue).main,
 								resume_episode: item.watchedEpisodes + 1,
 							})}
 					/>

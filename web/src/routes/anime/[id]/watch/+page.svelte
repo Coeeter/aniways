@@ -25,8 +25,8 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { getAppStateContext } from '$lib/context/state.svelte';
 	import { language } from '$lib/stores/language';
-	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { cn } from '$lib/utils';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -130,10 +130,7 @@
 	<title>
 		{titles.main} - Episode {data.episodeNumber} - Aniways
 	</title>
-	<meta
-		name="description"
-		content="Watch {titles.main} Episode {data.episodeNumber} on Aniways"
-	/>
+	<meta name="description" content="Watch {titles.main} Episode {data.episodeNumber} on Aniways" />
 </svelte:head>
 
 <div class="min-h-screen bg-background">
@@ -197,7 +194,7 @@
 								if (next && next.serverId !== selectedServer?.serverId) {
 									captureServerSwitch({
 										anime_id: data.anime.id,
-									anime_title: titles.main,
+										anime_title: titles.main,
 										episode_number: data.episodeNumber,
 										from_server: selectedServer?.serverName ?? 'unknown',
 										to_server: next.serverName,
@@ -227,7 +224,7 @@
 						{nextEpisodeUrl}
 						{updateLibrary}
 						animeId={data.anime.id}
-									animeTitle={titles.main}
+						animeTitle={titles.main}
 						episodeNumber={data.episodeNumber}
 						serverName={selectedServer?.serverName ?? 'unknown'}
 						streamType={selectedServer?.type?.toLowerCase() ?? 'unknown'}
@@ -272,7 +269,7 @@
 											return;
 										captureServerSwitch({
 											anime_id: data.anime.id,
-										anime_title: titles.main,
+											anime_title: titles.main,
 											episode_number: data.episodeNumber,
 											from_server: selectedServer?.serverName ?? 'unknown',
 											to_server: server.serverName,
@@ -295,11 +292,7 @@
 
 		<div class="rounded-lg border bg-card p-4">
 			<div class="flex items-start gap-4">
-				<img
-					src={data.anime.imageUrl}
-						alt={titles.main}
-					class="h-24 w-16 rounded object-cover"
-				/>
+				<img src={data.anime.imageUrl} alt={titles.main} class="h-24 w-16 rounded object-cover" />
 				<div class="flex-1 space-y-2">
 					<div>
 						<h2 class="line-clamp-1 text-lg font-bold">

@@ -32,8 +32,8 @@
 	import { getAppStateContext } from '$lib/context/state.svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 	import { language } from '$lib/stores/language';
-	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { cn } from '$lib/utils';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 
 	type LibraryResponse = components['schemas']['models.LibraryResponse'];
 	type AnimeResponse = components['schemas']['models.AnimeResponse'];
@@ -249,12 +249,12 @@
 								<Select.Content>
 									{#each variations as variation (variation.id)}
 										{@const isCurrent = variation.id === animeId}
-									<Select.Item value={variation.id} class="capitalize" disabled={isCurrent}>
-										{getLocalizedTitles(variation, languageValue).main}
-										{#if isCurrent}
-											<span class="ml-2 text-xs text-muted-foreground">(Current)</span>
-										{/if}
-									</Select.Item>
+										<Select.Item value={variation.id} class="capitalize" disabled={isCurrent}>
+											{getLocalizedTitles(variation, languageValue).main}
+											{#if isCurrent}
+												<span class="ml-2 text-xs text-muted-foreground">(Current)</span>
+											{/if}
+										</Select.Item>
 									{/each}
 								</Select.Content>
 							</Select.Root>
@@ -423,12 +423,12 @@
 								<Select.Content>
 									{#each variations as variation (variation.id)}
 										{@const isCurrent = variation.id === animeId}
-								<Select.Item value={variation.id} class="capitalize" disabled={isCurrent}>
-									{getLocalizedTitles(variation, languageValue).main}
-									{#if isCurrent}
-										<span class="ml-2 text-xs text-muted-foreground">(Current)</span>
-									{/if}
-								</Select.Item>
+										<Select.Item value={variation.id} class="capitalize" disabled={isCurrent}>
+											{getLocalizedTitles(variation, languageValue).main}
+											{#if isCurrent}
+												<span class="ml-2 text-xs text-muted-foreground">(Current)</span>
+											{/if}
+										</Select.Item>
 									{/each}
 								</Select.Content>
 							</Select.Root>

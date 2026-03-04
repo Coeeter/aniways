@@ -43,23 +43,6 @@
           "cmd": "bun run dev"
         }
       ]
-    },
-    {
-      "name": "aniways-desktop",
-      "dir": "./desktop",
-      "windows": [
-        {
-          "name": "editor",
-          "cmd": "nvim ."
-        },
-        {
-          "name": "terminal"
-        },
-        {
-          "name": "desktop",
-          "cmd": "cargo tauri dev"
-        }
-      ]
     }
   ]
 }

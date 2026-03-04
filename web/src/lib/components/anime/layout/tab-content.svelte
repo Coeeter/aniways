@@ -16,8 +16,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { language } from '$lib/stores/language';
-	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { cn } from '$lib/utils';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 
 	type AnimeResponse = components['schemas']['models.AnimeWithMetadataResponse'];
 	type EpisodeResponse = components['schemas']['models.EpisodeResponse'];
@@ -270,7 +270,7 @@
 								</div>
 								<img
 									src={relatedAnime.imageUrl}
-								alt={getLocalizedTitles(relatedAnime, languageValue).main}
+									alt={getLocalizedTitles(relatedAnime, languageValue).main}
 									class="h-20 w-14 rounded object-cover"
 								/>
 								<div class="min-w-0 flex-1">
@@ -281,7 +281,7 @@
 												!isCurrent && 'group-hover:text-primary',
 											)}
 										>
-									{getLocalizedTitles(relatedAnime, languageValue).main}
+											{getLocalizedTitles(relatedAnime, languageValue).main}
 										</h4>
 										{#if isCurrent}
 											<span
@@ -291,11 +291,11 @@
 											</span>
 										{/if}
 									</div>
-								{#if getLocalizedTitles(relatedAnime, languageValue).sub}
-									<p class="line-clamp-1 text-sm text-muted-foreground">
-										{getLocalizedTitles(relatedAnime, languageValue).sub}
-									</p>
-								{/if}
+									{#if getLocalizedTitles(relatedAnime, languageValue).sub}
+										<p class="line-clamp-1 text-sm text-muted-foreground">
+											{getLocalizedTitles(relatedAnime, languageValue).sub}
+										</p>
+									{/if}
 									<div class="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
 										<span class="capitalize">{relatedAnime.season} {relatedAnime.seasonYear}</span>
 										{#if relatedAnime.lastEpisode}
@@ -342,7 +342,7 @@
 								{/if}
 								<img
 									src={relatedAnime.imageUrl}
-								alt={getLocalizedTitles(relatedAnime, languageValue).main}
+									alt={getLocalizedTitles(relatedAnime, languageValue).main}
 									class="h-24 w-16 rounded object-cover"
 								/>
 								<div class="min-w-0 flex-1">
@@ -352,7 +352,7 @@
 											!isCurrent && 'group-hover:text-primary',
 										)}
 									>
-									{getLocalizedTitles(relatedAnime, languageValue).main}
+										{getLocalizedTitles(relatedAnime, languageValue).main}
 									</h4>
 									<div class="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
 										<span class="capitalize">{relatedAnime.season} {relatedAnime.seasonYear}</span>

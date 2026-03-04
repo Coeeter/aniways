@@ -6,8 +6,8 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Dialog, DialogContent, DialogHeader, DialogTitle } from '$lib/components/ui/dialog';
 	import { language } from '$lib/stores/language';
-	import { getLocalizedTitles } from '$lib/utils/anime-title';
 	import { cn } from '$lib/utils';
+	import { getLocalizedTitles } from '$lib/utils/anime-title';
 
 	type AnimeResponse = components['schemas']['models.AnimeWithMetadataResponse'];
 	type LibraryReponse = components['schemas']['models.LibraryResponse'];
@@ -74,7 +74,7 @@
 				<div class="group relative -mt-48 overflow-hidden rounded-lg shadow-2xl md:-mt-24">
 					<img
 						src={anime.metadata?.mainPictureUrl || anime.imageUrl}
-					alt={titles.main}
+						alt={titles.main}
 						class="aspect-[2/3] w-48 object-cover lg:w-56"
 					/>
 					{#if trailer}

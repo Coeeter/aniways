@@ -88,13 +88,13 @@
 							<div class="flex-1 space-y-2">
 								<div>
 									<h3 class="line-clamp-2 text-sm font-semibold sm:text-lg">
-									{getLocalizedTitles(a, languageValue).main}
+										{getLocalizedTitles(a, languageValue).main}
 									</h3>
-								{#if getLocalizedTitles(a, languageValue).sub}
-									<p class="text-sm text-muted-foreground">
-										{getLocalizedTitles(a, languageValue).sub}
-									</p>
-								{/if}
+									{#if getLocalizedTitles(a, languageValue).sub}
+										<p class="text-sm text-muted-foreground">
+											{getLocalizedTitles(a, languageValue).sub}
+										</p>
+									{/if}
 								</div>
 								<div class="flex flex-wrap gap-2">
 									{#each a.genre.split(', ').slice(0, 5) as genre (genre)}

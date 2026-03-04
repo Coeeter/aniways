@@ -141,19 +141,19 @@
 							>
 								<img
 									src={animeAppearance.anime.imageUrl}
-							alt={getLocalizedTitles(animeAppearance.anime, languageValue).main}
+									alt={getLocalizedTitles(animeAppearance.anime, languageValue).main}
 									class="h-20 w-14 flex-shrink-0 rounded object-cover"
 									loading="lazy"
 								/>
 								<div class="min-w-0 flex-1">
 									<h3 class="line-clamp-2 font-semibold group-hover:text-primary">
-								{getLocalizedTitles(animeAppearance.anime, languageValue).main}
+										{getLocalizedTitles(animeAppearance.anime, languageValue).main}
 									</h3>
-							{#if getLocalizedTitles(animeAppearance.anime, languageValue).sub}
-								<p class="line-clamp-1 text-sm text-muted-foreground">
-									{getLocalizedTitles(animeAppearance.anime, languageValue).sub}
-								</p>
-							{/if}
+									{#if getLocalizedTitles(animeAppearance.anime, languageValue).sub}
+										<p class="line-clamp-1 text-sm text-muted-foreground">
+											{getLocalizedTitles(animeAppearance.anime, languageValue).sub}
+										</p>
+									{/if}
 									<div class="mt-2 flex items-center gap-2">
 										<Badge variant="secondary" class="text-xs">
 											{animeAppearance.role}

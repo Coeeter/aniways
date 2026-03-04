@@ -126,26 +126,26 @@
 				{:else}
 					{#each searchResource.current as anime (anime.id)}
 						<Command.LinkItem
-						value={getLocalizedTitles(anime, languageValue).main}
+							value={getLocalizedTitles(anime, languageValue).main}
 							class="flex cursor-pointer items-center gap-3 p-3 hover:bg-accent"
 							href="/anime/{anime.id}"
 						>
 							<div class="relative h-16 w-12 flex-shrink-0 overflow-hidden rounded-md">
 								<img
 									src={anime.imageUrl}
-							alt={getLocalizedTitles(anime, languageValue).main}
+									alt={getLocalizedTitles(anime, languageValue).main}
 									class="h-full w-full object-cover"
 								/>
 							</div>
 							<div class="min-w-0 flex-1">
 								<div class="line-clamp-1 font-medium">
-								{getLocalizedTitles(anime, languageValue).main}
+									{getLocalizedTitles(anime, languageValue).main}
 								</div>
-							{#if getLocalizedTitles(anime, languageValue).sub}
-								<div class="line-clamp-1 text-sm text-muted-foreground">
-									{getLocalizedTitles(anime, languageValue).sub}
-								</div>
-							{/if}
+								{#if getLocalizedTitles(anime, languageValue).sub}
+									<div class="line-clamp-1 text-sm text-muted-foreground">
+										{getLocalizedTitles(anime, languageValue).sub}
+									</div>
+								{/if}
 								<div class="flex items-center gap-2 text-xs text-muted-foreground">
 									<span class="capitalize">{anime.season} {anime.seasonYear}</span>
 									{#if anime.genre}
