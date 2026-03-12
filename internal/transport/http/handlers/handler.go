@@ -53,7 +53,6 @@ func (h *Handler) RegisterRoutes() {
 	h.LibraryRoutes()
 	h.SettingsRoutes()
 	h.AdminRoutes()
-	h.DesktopRoutes()
 
 	h.RegisterOpenAPIRoutes()
 

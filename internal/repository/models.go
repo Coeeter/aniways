@@ -55,52 +55,6 @@ func (ns NullAiringStatus) Value() (driver.Value, error) {
 	return string(ns.AiringStatus), nil
 }
 
-type DesktopPlatform string
-
-const (
-	DesktopPlatformDarwinArm64 DesktopPlatform = "darwin-arm64"
-	DesktopPlatformDarwinX64   DesktopPlatform = "darwin-x64"
-	DesktopPlatformWin32X64    DesktopPlatform = "win32-x64"
-	DesktopPlatformWin32Arm64  DesktopPlatform = "win32-arm64"
-	DesktopPlatformLinuxX64    DesktopPlatform = "linux-x64"
-	DesktopPlatformLinuxArm64  DesktopPlatform = "linux-arm64"
-)
-
-func (e *DesktopPlatform) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = DesktopPlatform(s)
-	case string:
-		*e = DesktopPlatform(s)
-	default:
-		return fmt.Errorf("unsupported scan type for DesktopPlatform: %T", src)
-	}
-	return nil
-}
-
-type NullDesktopPlatform struct {
-	DesktopPlatform DesktopPlatform
-	Valid           bool // Valid is true if DesktopPlatform is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullDesktopPlatform) Scan(value interface{}) error {
-	if value == nil {
-		ns.DesktopPlatform, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.DesktopPlatform.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullDesktopPlatform) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.DesktopPlatform), nil
-}
-
 type LibraryActions string
 
 const (
@@ -452,17 +406,6 @@ type AnimeMetadatum struct {
 	Season             Season
 	CreatedAt          pgtype.Timestamp
 	UpdatedAt          pgtype.Timestamp
-}
-
-type DesktopRelease struct {
-	ID           string
-	Version      string
-	Platform     DesktopPlatform
-	DownloadUrl  string
-	FileName     string
-	FileSize     int64
-	ReleaseNotes pgtype.Text
-	CreatedAt    pgtype.Timestamp
 }
 
 type ExternalLibrarySync struct {
