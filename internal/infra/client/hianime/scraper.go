@@ -35,7 +35,7 @@ func NewHianimeScraper() *HianimeScraper {
 	}
 
 	return &HianimeScraper{
-		fetcher: NewFetcher("https://hianimez.to", client),
+		fetcher: NewFetcher("https://aniwatchtv.to", client),
 	}
 }
 
@@ -454,10 +454,6 @@ func (s *HianimeScraper) GetStreamData(
 		}, nil
 	}
 
-	if !strings.HasPrefix(strings.ToLower(serverName), "hd") {
-		return ScrapedStreamData{}, fmt.Errorf("unsupported server: %s", serverName)
-	}
-
 	headers := map[string]string{
 		"Referer":          s.fetcher.baseURL,
 		"X-Requested-With": "XMLHttpRequest",
@@ -848,7 +844,7 @@ var (
 
 func (s *HianimeScraper) extractToken(ctx context.Context, url string) (string, error) {
 	req, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
-	req.Header.Set("Referer", "https://hianimez.to/")
+	req.Header.Set("Referer", "https://aniwatchtv.to/")
 	resp, err := s.fetcher.Client.Do(req)
 	if err != nil {
 		return "", err
