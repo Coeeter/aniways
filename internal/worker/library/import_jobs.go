@@ -162,6 +162,11 @@ func importFromMal(
 				continue
 			}
 
+			if len(anime) == 0 {
+				log.Warn("anime not found in database, skipping library entry", "mal_id", malID)
+				continue
+			}
+
 			var inLibraryAlready bool
 			var animeID string
 			for _, a := range anime {
@@ -259,6 +264,11 @@ func importFromAnilist(
 			anime, err := repo.GetAnimeByMalId(ctx, malID)
 			if err != nil {
 				log.Error("failed to get anime by mal id", "mal_id", malID, "err", err)
+				continue
+			}
+
+			if len(anime) == 0 {
+				log.Warn("anime not found in database, skipping library entry", "mal_id", malID)
 				continue
 			}
 
