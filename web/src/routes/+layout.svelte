@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { CircleAlert } from 'lucide-svelte';
 	import posthog from 'posthog-js';
 	import { onMount } from 'svelte';
 	import { afterNavigate } from '$app/navigation';
-	import { page } from '$app/state';
 	import { PUBLIC_APP_ENV } from '$env/static/public';
 	import { capturePageview, initAnalytics } from '$lib/analytics';
 	import Footer from '$lib/components/layout/footer.svelte';
@@ -71,16 +69,6 @@
 	<NavBar />
 </div>
 <div class="relative flex min-h-screen flex-col">
-	{#if page.url.pathname === '/'}
-		<div
-			class="absolute top-0 left-0 z-30 flex w-full items-center border border-red-400 bg-red-800 p-4 text-foreground"
-		>
-			<CircleAlert class="mr-2 inline size-16" />
-			The website is unable to stream content due to parent server limitations. I suggest using another
-			website in the meantime. I'm actively working on a solution to this issue. I apologize for the
-			inconvenience and appreciate your understanding.
-		</div>
-	{/if}
 	<div class="flex-1 pb-4">
 		{@render children?.()}
 	</div>
