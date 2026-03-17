@@ -24,23 +24,11 @@
         {
           "name": "proxy",
           "cmd": "make dev-proxy"
-        }
-      ]
-    },
-    {
-      "name": "aniways-frontend",
-      "dir": "./web",
-      "windows": [
-        {
-          "name": "editor",
-          "cmd": "nvim ."
-        },
-        {
-          "name": "terminal"
         },
         {
           "name": "frontend",
-          "cmd": "bun run dev"
+          "cmd": "bun run dev",
+          "dir": "./web"
         }
       ]
     }
