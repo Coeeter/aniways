@@ -1,17 +1,36 @@
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Button } from '#/components/ui/button'
+import { api } from '#/lib/api'
 
-export const Route = createFileRoute('/')({ component: App })
+const options = api.queryOptions('get', '/home')
+
+export const Route = createFileRoute('/')({
+  loader: async ({ context }) => {
+    return await context.queryClient.ensureQueryData(options)
+  },
+  component: App,
+})
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <div className="container mx-auto">
-      <h1>Aniways</h1>
-      <p>Count: {count}</p>
-      <Button onClick={() => setCount((c) => c + 1)}>Increment</Button>
+      <FeaturedAnime />
+    </div>
+  )
+}
+
+function FeaturedAnime() {
+  const { data, error } = useSuspenseQuery(options)
+
+  if (error || !data.featuredAnime) {
+    return <div>Error: {error?.error ?? 'No Featured Anime'}</div>
+  }
+
+  return (
+    <div>
+      <h2>Featured Anime</h2>
+      <div>{data.featuredAnime.jname}</div>
+      <img src={data.featuredAnime.metadata?.mainPictureUrl} alt={data.featuredAnime.jname} />
     </div>
   )
 }
