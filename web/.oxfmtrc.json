@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": [],
+  "semi": false,
+  "singleQuote": true,
+  "sortImports": {
+    "newlinesBetween": false,
+    "internalPattern": ["#/"]
+  },
+  "sortTailwindcss": {
+    "stylesheet": "./src/styles.css",
+    "functions": ["clsx", "cn", "cva", "tv"]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["import", "react", "jsx-a11y"],
+  "categories": {},
+  "rules": {},
+  "settings": {
+    "jsx-a11y": {
+      "components": {
+        "Link": "a"
+      },
+      "attributes": {}
+    },
+    "react": {
+      "formComponents": [],
+      "linkComponents": [
+        {
+          "name": "Link",
+          "attribute": "to"
+        }
+      ],
+      "componentWrapperFunctions": []
+    }
+  },
+  "env": {
+    "builtin": true
+  },
+  "globals": {},
+  "ignorePatterns": []
+}
