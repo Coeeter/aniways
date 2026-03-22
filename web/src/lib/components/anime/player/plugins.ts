@@ -170,12 +170,13 @@ export const skipPlugin = (source: StreamInfo) => {
 				source.intro &&
 				art.currentTime >= source.intro.start &&
 				art.currentTime <= source.intro.end &&
-				!art.controls['opening']
+				!art.layers['opening']
 			) {
-				art.controls.add({
+				const height = art.template.$controls.getBoundingClientRect().height;
+				art.layers.add({
 					name: 'opening',
 					position: 'top',
-					html: `<button class="${buttonVariants({ class: 'absolute bottom-6 right-0 pointer-events-auto touch-manipulation' })}">Skip Opening</button>`,
+					html: `<button class="${buttonVariants({ class: 'absolute right-[10px] pointer-events-auto touch-manipulation' })}" style="bottom: ${height + 20}px;">Skip Opening</button>`,
 					click: (_, e) => {
 						e.preventDefault();
 						e.stopPropagation();
@@ -194,12 +195,13 @@ export const skipPlugin = (source: StreamInfo) => {
 				source.outro &&
 				art.currentTime >= source.outro.start &&
 				art.currentTime <= source.outro.end &&
-				!art.controls['ending']
+				!art.layers['ending']
 			) {
-				art.controls.add({
+				const height = art.template.$controls.getBoundingClientRect().height;
+				art.layers.add({
 					name: 'ending',
 					position: 'top',
-					html: `<button class="${buttonVariants({ class: 'absolute bottom-6 right-0 pointer-events-auto touch-manipulation' })}">Skip Ending</button>`,
+					html: `<button class="${buttonVariants({ class: 'absolute right-[10px] pointer-events-auto touch-manipulation' })}" style="bottom: ${height + 20}px;">Skip Ending</button>`,
 					click: (_, e) => {
 						e.preventDefault();
 						e.stopPropagation();
@@ -217,17 +219,17 @@ export const skipPlugin = (source: StreamInfo) => {
 			if (
 				source.intro &&
 				(art.currentTime < source.intro.start || art.currentTime > source.intro.end) &&
-				art.controls['opening']
+				art.layers['opening']
 			) {
-				art.controls.remove('opening');
+				art.layers.remove('opening');
 			}
 
 			if (
 				source.outro &&
 				(art.currentTime < source.outro.start || art.currentTime > source.outro.end) &&
-				art.controls['ending']
+				art.layers['ending']
 			) {
-				art.controls.remove('ending');
+				art.layers.remove('ending');
 			}
 		});
 

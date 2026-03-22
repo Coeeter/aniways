@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/Coeeter/ntmux/refs/heads/main/schema.json",
   "sessions": [
     {
-      "name": "aniways-backend",
+      "name": "aniways",
       "default": true,
       "windows": [
         {
