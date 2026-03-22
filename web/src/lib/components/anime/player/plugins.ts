@@ -250,7 +250,7 @@ export const windowKeyBindPlugin = () => {
 			}
 		};
 
-		art.events.proxy(window, 'keydown', keydownHandler);
+		window.addEventListener('keydown', keydownHandler);
 
 		art.on('destroy', () => {
 			window.removeEventListener('keydown', keydownHandler);
