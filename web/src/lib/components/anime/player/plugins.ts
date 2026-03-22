@@ -245,6 +245,7 @@ export const windowKeyBindPlugin = () => {
 
 			if (Object.keys(art.hotkey.keys).includes(e.code)) {
 				e.preventDefault();
+				e.stopPropagation();
 				art.hotkey.keys[e.code]?.forEach((fn) => fn?.(e));
 			}
 		};
