@@ -132,7 +132,7 @@ func rateLimiter(env *config.Env) func(http.Handler) http.Handler {
 				return
 			}
 
-			if r.URL.Path == "/anime/listings" || r.URL.Path == "/anime/listings/search" {
+			if r.URL.Path == "/anime/listings" || r.URL.Path == "/anime/listings/search" || r.URL.Path == "/home" {
 				next.ServeHTTP(w, r)
 				return
 			}
