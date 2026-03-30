@@ -14,10 +14,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+const (
+	dbRetryInterval = 2 * time.Second
+)
+
 //go:embed migrations/*.sql
 var migrationFS embed.FS
 
-func New(env *config.Env, log *slog.Logger) (*pgxpool.Pool, error) {
+func New(ctx context.Context, env *config.Env, log *slog.Logger) (*pgxpool.Pool, error) {
 	log.Info("initialising database connection")
 
 	cfg, err := pgxpool.ParseConfig(env.DatabaseURL)
@@ -27,16 +31,35 @@ func New(env *config.Env, log *slog.Logger) (*pgxpool.Pool, error) {
 	cfg.MaxConns = 10
 	cfg.MinConns = 2
 
-	pool, err := pgxpool.NewWithConfig(context.Background(), cfg)
+	pool, err := pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("open pool: %w", err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-	if err := pool.Ping(ctx); err != nil {
-		pool.Close()
-		return nil, fmt.Errorf("db ping: %w", err)
+	isDev := env.AppEnv == "development"
+
+	for attempt := 1; ; attempt++ {
+		pingCtx, pingCancel := context.WithTimeout(ctx, 3*time.Second)
+		pingErr := pool.Ping(pingCtx)
+		pingCancel()
+		if pingErr == nil {
+			break
+		}
+		if !isDev {
+			pool.Close()
+			return nil, fmt.Errorf("db ping: %w", pingErr)
+		}
+		log.Warn("database not ready, retrying...",
+			"attempt", attempt,
+			"error", pingErr,
+			"retry_in", dbRetryInterval,
+		)
+		select {
+		case <-ctx.Done():
+			pool.Close()
+			return nil, fmt.Errorf("db ping cancelled: %w", ctx.Err())
+		case <-time.After(dbRetryInterval):
+		}
 	}
 	log.Info("database ping OK")
 

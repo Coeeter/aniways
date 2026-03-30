@@ -49,7 +49,7 @@ func InitDeps(ctx context.Context, svcName string) (*Deps, error) {
 	}
 
 	dbLog := rootLogger.With("component", "database")
-	db, err := database.New(env, dbLog)
+	db, err := database.New(ctx, env, dbLog)
 	if err != nil {
 		return deps, fmt.Errorf("failed to initialize database: %w", err)
 	}
