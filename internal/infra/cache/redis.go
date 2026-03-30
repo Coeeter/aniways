@@ -10,6 +10,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+const (
+	redisRetryInterval = 2 * time.Second
+)
+
 type RedisClient struct {
 	r        redis.Cmdable
 	appEnv   string
@@ -31,8 +35,28 @@ func NewRedisClient(
 		WriteTimeout: 2 * time.Second,
 	})
 
-	if err := rdb.Ping(ctx).Err(); err != nil {
-		return nil, fmt.Errorf("redis ping: %w", err)
+	isDev := appEnv == "development"
+
+	for attempt := 1; ; attempt++ {
+		pingCtx, pingCancel := context.WithTimeout(ctx, 3*time.Second)
+		pingErr := rdb.Ping(pingCtx).Err()
+		pingCancel()
+		if pingErr == nil {
+			break
+		}
+		if !isDev {
+			return nil, fmt.Errorf("redis ping: %w", pingErr)
+		}
+		log.Warn("redis not ready, retrying...",
+			"attempt", attempt,
+			"error", pingErr,
+			"retry_in", redisRetryInterval,
+		)
+		select {
+		case <-ctx.Done():
+			return nil, fmt.Errorf("redis ping cancelled: %w", ctx.Err())
+		case <-time.After(redisRetryInterval):
+		}
 	}
 
 	log.Info("connected to redis", "addr", addr, "useCache", useCache)
