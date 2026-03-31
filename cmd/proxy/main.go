@@ -22,11 +22,10 @@ import (
 )
 
 var (
-	addr        = flag.String("addr", ":1234", "Address to listen on")
-	userAgent   = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-	logger      = app.NewLogger("PROXY")
-	allowedExts = getAllowedExts()
-	client      = &http.Client{
+	addr      = flag.String("addr", ":1234", "Address to listen on")
+	userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+	logger    = app.NewLogger("PROXY")
+	client    = &http.Client{
 		Timeout: 15 * time.Second,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -36,16 +35,6 @@ var (
 		},
 	}
 )
-
-func getAllowedExts() map[string]bool {
-	return map[string]bool{
-		".m3u8": true, ".ts": true, ".png": true,
-		".jpg": true, ".webp": true, ".ico": true,
-		".html": true, ".js": true, ".css": true,
-		".txt": true,
-	}
-
-}
 
 func main() {
 	flag.Parse()
@@ -210,12 +199,11 @@ func proxyHandler(w http.ResponseWriter, r *http.Request) {
 			out := line
 
 			if !strings.HasPrefix(line, "#") {
-				e := strings.ToLower(path.Ext(line))
 				parts := strings.Split(line, "#")
 				// For .vtt thumbnail contents
 				if len(parts) > 1 {
 					out = encodeProxyURL(parts[0]) + "#" + parts[1]
-				} else if _, ok := allowedExts[e]; ok {
+				} else {
 					out = encodeProxyURL(line)
 				}
 			}
