@@ -114,13 +114,13 @@ func proxyHandler(w http.ResponseWriter, r *http.Request) {
 	targetURLBytes, err := base64.URLEncoding.DecodeString(pEnc)
 	if err != nil {
 		http.Error(w, "invalid URL encoding", http.StatusBadRequest)
-		logger.Error("error decoding target URL", "err", err, "pEnc", pEnc)
+		logger.Error("error decoding target URL", "err", err, "pEnc", pEnc, "server", serverName)
 		return
 	}
 	targetURL, err := url.Parse(string(targetURLBytes))
 	if err != nil || (targetURL.Scheme != "http" && targetURL.Scheme != "https") {
 		http.Error(w, "invalid target URL", http.StatusBadRequest)
-		logger.Error("error parsing target URL", "err", err, "targetURL", string(targetURLBytes))
+		logger.Error("error parsing target URL", "err", err, "targetURL", string(targetURLBytes), "server", serverName)
 		return
 	}
 
@@ -140,7 +140,7 @@ func proxyHandler(w http.ResponseWriter, r *http.Request) {
 
 	req, err := http.NewRequestWithContext(ctx, r.Method, targetURL.String(), nil)
 	if err != nil {
-		logger.Error("error creating request", "err", err)
+		logger.Error("error creating request", "err", err, "server", serverName, "targetURL", targetURL, "headers", headers.Clone())
 		http.Error(w, "bad target URL", http.StatusBadRequest)
 		return
 	}
@@ -149,7 +149,7 @@ func proxyHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		logger.Error("error fetching upstream", "err", err)
+		logger.Error("error fetching upstream", "err", err, "server", serverName, "targetURL", targetURL, "headers", headers.Clone())
 		http.Error(w, "upstream fetch failed", http.StatusBadGateway)
 		return
 	}
@@ -203,7 +203,7 @@ func proxyHandler(w http.ResponseWriter, r *http.Request) {
 				// For .vtt thumbnail contents
 				if len(parts) > 1 {
 					out = encodeProxyURL(parts[0]) + "#" + parts[1]
-				} else {
+				} else if ext != ".vtt" {
 					out = encodeProxyURL(line)
 				}
 			}

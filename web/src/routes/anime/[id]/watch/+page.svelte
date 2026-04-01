@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { type } from 'arktype';
 	import {
 		ArrowLeft,
 		ChevronLeft,
@@ -13,6 +14,7 @@
 		Star,
 	} from 'lucide-svelte';
 	import { resource } from 'runed';
+	import { useSearchParams } from 'runed/kit';
 	import { toast } from 'svelte-sonner';
 	import { flip } from 'svelte/animate';
 	import { invalidate } from '$app/navigation';
@@ -34,7 +36,24 @@
 	const languageValue = $derived($language);
 	const titles = $derived.by(() => getLocalizedTitles(data.anime, languageValue));
 
-	let selectedServer = $derived(data.servers[0] || null);
+	const serverParamsSchema = type({
+		server: 'string = ""',
+		type: '"sub"|"dub" = "sub"',
+	});
+
+	let params = useSearchParams(serverParamsSchema);
+
+	const selectedServer = $derived.by(() => {
+		return (
+			data.servers.find(
+				(s) =>
+					s.serverName.toLowerCase() === params.server.toLowerCase() &&
+					s.type.toLowerCase() === params.type.toLowerCase(),
+			) ||
+			data.servers[0] ||
+			null
+		);
+	});
 
 	// Track stream errors once per error instance
 	let lastTrackedError = $state<string | null>(null);
@@ -135,7 +154,7 @@
 
 <div class="min-h-screen bg-background">
 	<header
-		class="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+		class="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60"
 	>
 		<div class="container mx-auto flex h-16 items-center gap-4 px-4">
 			<Button href="/anime/{data.anime.id}" variant="ghost" size="icon">
@@ -202,7 +221,10 @@
 										reason: 'error_fallback',
 									});
 								}
-								selectedServer = next;
+								if (next) {
+									params.server = next.serverName.toLowerCase();
+									params.type = next.type.toLowerCase() === 'dub' ? 'dub' : 'sub';
+								}
 							}}
 							variant="secondary"
 							size="sm"
@@ -276,7 +298,8 @@
 											stream_type: server.type.toLowerCase(),
 											reason: 'manual',
 										});
-										selectedServer = server;
+										params.server = server.serverName.toLowerCase();
+										params.type = server.type.toLowerCase() === 'dub' ? 'dub' : 'sub';
 									}}
 									class="justify-start"
 								>
@@ -383,7 +406,7 @@
 						>
 							<div
 								class={cn(
-									'flex aspect-square w-10 flex-shrink-0 items-center justify-center rounded text-xs font-bold',
+									'flex aspect-square w-10 shrink-0 items-center justify-center rounded text-xs font-bold',
 									'bg-accent text-accent-foreground',
 								)}
 							>
@@ -400,7 +423,7 @@
 								{/if}
 								<Play
 									class={cn(
-										'h-3 w-3 flex-shrink-0',
+										'h-3 w-3 shrink-0',
 										episode.id === data.currentEpisode.id || 'opacity-0 group-hover:opacity-100',
 									)}
 								/>
