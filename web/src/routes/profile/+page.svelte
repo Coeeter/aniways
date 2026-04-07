@@ -351,8 +351,8 @@
 							<Heart class="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
 							<h4 class="mb-2 text-lg font-medium">Keep Exploring!</h4>
 							<p class="mb-4 text-sm text-muted-foreground">
-								You have {data.stats.watching + data.stats.planning + data.stats.completed} anime in
-								your library
+								You have {data.stats.watching + data.stats.planning + data.stats.completed} anime in your
+								library
 							</p>
 							<div class="flex justify-center gap-2">
 								<Button variant="outline" href="/my-list">

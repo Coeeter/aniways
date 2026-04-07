@@ -64,7 +64,7 @@ export const createArtPlayer = ({
 		artplayerPluginHlsControl({
 			quality: {
 				setting: true,
-				getName: (level: { height: number }) => `${level.height}p`,
+				getName: (level) => `${(level as { height: number }).height}p`,
 				title: 'Quality',
 				auto: 'Auto',
 			},

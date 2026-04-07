@@ -19,7 +19,7 @@ export const handleFetch: HandleFetch = async ({ event, request, fetch }) => {
 		// multiple users to share a single rate limit bucket).
 		const clientIp =
 			event.request.headers.get('cf-connecting-ip') ||
-			event.request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+			event.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
 			event.getClientAddress();
 		if (clientIp) {
 			request.headers.set('cf-connecting-ip', clientIp);
