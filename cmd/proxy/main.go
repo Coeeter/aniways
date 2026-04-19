@@ -198,7 +198,9 @@ func proxyHandler(w http.ResponseWriter, r *http.Request) {
 			line := scanner.Text()
 			out := line
 
-			if !strings.HasPrefix(line, "#") {
+			if strings.TrimSpace(line) == "" {
+				out = ""
+			} else if !strings.HasPrefix(line, "#") {
 				parts := strings.Split(line, "#")
 				// For .vtt thumbnail contents
 				if len(parts) > 1 {
