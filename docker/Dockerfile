@@ -7,7 +7,6 @@ RUN go mod download
 COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /out/api ./cmd/api
-RUN CGO_ENABLED=0 GOOS=linux go build -o /out/proxy ./cmd/proxy
 RUN CGO_ENABLED=0 GOOS=linux go build -o /out/worker ./cmd/worker
 
 # --- API ---
@@ -20,15 +19,6 @@ RUN adduser -D aniways - \
     && chown -R aniways:aniways /app/tmp
 USER aniways
 CMD ["/app/entrypoint.sh", "/app/api"]
-
-# --- PROXY ---
-FROM alpine:3.20 AS proxy
-WORKDIR /app
-COPY --from=builder /out/proxy /app/proxy
-RUN apk add --no-cache ca-certificates
-RUN adduser -D aniways
-USER aniways
-CMD ["/app/proxy"]
 
 # --- WORKER ---
 FROM alpine:3.20 AS worker

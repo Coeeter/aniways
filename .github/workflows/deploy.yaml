@@ -2,15 +2,13 @@ name: Deploy
 
 on:
   workflow_dispatch:
-  push:
-    branches: ["main"]
 
 jobs:
   build-and-push-images:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [api, proxy, worker]
+        service: [api, worker]
     steps:
       - uses: actions/checkout@v4
 

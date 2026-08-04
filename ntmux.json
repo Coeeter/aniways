@@ -22,10 +22,6 @@
           "cmd": "make dev-worker"
         },
         {
-          "name": "proxy",
-          "cmd": "make dev-proxy"
-        },
-        {
           "name": "frontend",
           "cmd": "bun run dev",
           "dir": "./web"

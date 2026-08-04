@@ -63,12 +63,6 @@ services:
       timeout: 10s
       retries: 3
 
-  proxy:
-    image: ${DOCKER_USERNAME}/aniways-proxy:latest
-    ports:
-      - "1234:1234"
-    restart: unless-stopped
-
   worker:
     image: ${DOCKER_USERNAME}/aniways-worker:latest
     environment:

@@ -1,6 +1,5 @@
 # Variables
 API_CMD := ./cmd/api
-PROXY_CMD := ./cmd/proxy
 WORKER_CMD := ./cmd/worker
 TMP_DIR := ./tmp
 DOCKER_COMPOSE_FILE := docker/docker-compose.dev.yaml
@@ -10,16 +9,11 @@ ENV_FILE := .env.local
 .DEFAULT_GOAL := help
 
 # ----- Local Dev ----- #
-.PHONY: dev-api dev-proxy dev-worker
+.PHONY: dev-api dev-worker
 dev-api: ## Run API with Air
 	air -c .air.toml \
 		-build.cmd "go build -o $(TMP_DIR)/api $(API_CMD)" \
 		-build.bin "$(TMP_DIR)/api"
-
-dev-proxy: ## Run proxy locally
-	air -c .air.toml \
-		-build.cmd "go build -o $(TMP_DIR)/proxy $(PROXY_CMD)" \
-		-build.full_bin "APP_ENV=development $(TMP_DIR)/proxy"
 
 dev-worker: ## Run worker locally
 	air -c .air.toml \
